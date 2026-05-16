@@ -32,6 +32,153 @@ function isUUID(id: unknown): id is string {
   );
 }
 
+// ─── Job Scraper Helpers ────────────────────────────────────────────────────
+
+function extractXmlField(block: string, tag: string): string {
+  const m = block.match(new RegExp(`<${tag}>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`));
+  return m?.[1]?.trim() ?? "";
+}
+
+async function scrapeIndeedRSS(query: string, location: string, days: number): Promise<any[]> {
+  const url = `https://www.indeed.com/rss?q=${encodeURIComponent(query)}&l=${encodeURIComponent(location)}&sort=date&fromage=${days}`;
+  const r = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)", "Accept": "text/xml,application/xml" },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!r.ok) throw new Error(`Indeed ${r.status}`);
+  const xml = await r.text();
+  const jobs: any[] = [];
+  const re = /<item>([\s\S]*?)<\/item>/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(xml)) !== null) {
+    const block = m[1];
+    const title = extractXmlField(block, "title").replace(/ - [^-]+$/, "").trim();
+    const link  = extractXmlField(block, "link");
+    const company = extractXmlField(block, "source");
+    const pubDate = extractXmlField(block, "pubDate");
+    const guid  = extractXmlField(block, "guid") || link;
+    const desc  = extractXmlField(block, "description");
+    const locM  = desc.replace(/<[^>]+>/g, " ").match(/([A-Za-z ]+,\s*[A-Z]{2}(?:\s+\d{5})?)/);
+    if (title && link) {
+      jobs.push({
+        id: `indeed_${Buffer.from(guid).toString("base64").replace(/\W/g, "").slice(0, 20)}`,
+        title, company, source: "indeed",
+        location: locM?.[1]?.trim() || location || "Not specified",
+        url: link,
+        postedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+        tags: [],
+      });
+    }
+  }
+  return jobs;
+}
+
+async function scrapeWuzzuf(query: string, location: string, days: number): Promise<any[]> {
+  const locParam = location ? `&filters[city][]=${encodeURIComponent(location)}` : "";
+  const url = `https://wuzzuf.net/search/jobs/?q=${encodeURIComponent(query)}${locParam}&a=hpb`;
+  const r = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml",
+    },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!r.ok) throw new Error(`Wuzzuf ${r.status}`);
+  const html = await r.text();
+  const nd = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
+  if (!nd) throw new Error("Wuzzuf: no __NEXT_DATA__");
+  const data = JSON.parse(nd[1]);
+  const raw: any[] = data?.props?.pageProps?.jobs ?? [];
+  const cutoff = Date.now() - days * 86400000;
+  return raw
+    .filter((j: any) => !j.created_at || new Date(j.created_at).getTime() >= cutoff)
+    .slice(0, 20)
+    .map((j: any) => ({
+      id: `wuzzuf_${j.id ?? j.slug}`,
+      title: j.title ?? "",
+      company: j.company?.name ?? "",
+      location: [j.city?.name, j.country?.name].filter(Boolean).join(", ") || "Egypt",
+      url: `https://wuzzuf.net/jobs/p/${j.slug ?? j.id}`,
+      source: "wuzzuf",
+      postedAt: j.created_at ?? new Date().toISOString(),
+      tags: (j.required_skills ?? []).map((s: any) => s.name ?? s),
+    }));
+}
+
+async function scrapeBayt(query: string, location: string, days: number): Promise<any[]> {
+  const slug = query.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const url = `https://www.bayt.com/en/international/jobs/${slug}-jobs/`;
+  const r = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "Accept": "text/html,application/xhtml+xml",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!r.ok) throw new Error(`Bayt ${r.status}`);
+  const html = await r.text();
+  const jobs: any[] = [];
+  const ldRe = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g;
+  let m: RegExpExecArray | null;
+  const cutoff = Date.now() - days * 86400000;
+  while ((m = ldRe.exec(html)) !== null && jobs.length < 20) {
+    try {
+      const obj = JSON.parse(m[1]);
+      if (obj["@type"] === "JobPosting" && obj.title) {
+        const posted = obj.datePosted ? new Date(obj.datePosted).getTime() : Date.now();
+        if (posted >= cutoff) {
+          jobs.push({
+            id: `bayt_${Buffer.from(obj.url ?? obj.title).toString("base64").replace(/\W/g, "").slice(0, 16)}`,
+            title: obj.title,
+            company: obj.hiringOrganization?.name ?? "",
+            location: [
+              obj.jobLocation?.address?.addressLocality,
+              obj.jobLocation?.address?.addressCountry,
+            ].filter(Boolean).join(", ") || location || "Middle East",
+            url: obj.url ?? url,
+            source: "bayt",
+            postedAt: obj.datePosted ?? new Date().toISOString(),
+            tags: [],
+          });
+        }
+      }
+    } catch {}
+  }
+  return jobs;
+}
+
+async function scrapeRemoteOKTagged(query: string): Promise<any[]> {
+  const words = query.toLowerCase().split(/\s+/);
+  const skip = new Set(["developer", "engineer", "senior", "junior", "full", "stack", "and", "the"]);
+  const tag = words.find((w) => w.length > 3 && !skip.has(w)) ?? words[0];
+  const r = await fetch(`https://remoteok.com/api?tag=${encodeURIComponent(tag)}`, {
+    headers: { "User-Agent": "Mozilla/5.0 DevStudio/1.0", "Accept": "application/json" },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!r.ok) throw new Error(`RemoteOK ${r.status}`);
+  const data = await r.json() as any[];
+  return data.slice(1)
+    .filter((j: any) => j.id && j.title)
+    .slice(0, 15)
+    .map((j: any) => ({
+      id: `remoteok_${j.id}`,
+      title: j.title ?? "",
+      company: j.company ?? "",
+      location: j.location || "Remote",
+      url: j.url ?? "",
+      source: "remoteok",
+      postedAt: j.date ?? new Date().toISOString(),
+      tags: j.tags ?? [],
+      salary: j.salary_min
+        ? `$${Number(j.salary_min).toLocaleString()} – $${Number(j.salary_max ?? j.salary_min).toLocaleString()}`
+        : "",
+      logo: j.company_logo ?? "",
+    }));
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+
 export function registerRoutes(app: Express) {
 
   // --- PROMPTS ---
@@ -468,6 +615,32 @@ export function registerRoutes(app: Express) {
     } catch {
       res.status(502).json({ error: "Failed to fetch remote jobs" });
     }
+  });
+
+  app.get("/api/jobs/scrape", async (req, res) => {
+    const uid = requireUser(req, res); if (!uid) return;
+    const query   = String(req.query.q || "full stack developer");
+    const location = String(req.query.location || "");
+    const days    = Math.max(1, Math.min(Number(req.query.days || 1), 30));
+    const sources = String(req.query.sources || "indeed,wuzzuf,bayt,remoteok")
+      .split(",").map((s) => s.trim()).filter(Boolean);
+
+    const results: any[] = [];
+    const errors: string[] = [];
+    const tasks: Promise<void>[] = [];
+
+    if (sources.includes("indeed"))
+      tasks.push(scrapeIndeedRSS(query, location, days).then((j) => results.push(...j)).catch(() => errors.push("indeed")));
+    if (sources.includes("wuzzuf"))
+      tasks.push(scrapeWuzzuf(query, location, days).then((j) => results.push(...j)).catch(() => errors.push("wuzzuf")));
+    if (sources.includes("bayt"))
+      tasks.push(scrapeBayt(query, location, days).then((j) => results.push(...j)).catch(() => errors.push("bayt")));
+    if (sources.includes("remoteok"))
+      tasks.push(scrapeRemoteOKTagged(query).then((j) => results.push(...j)).catch(() => errors.push("remoteok")));
+
+    await Promise.allSettled(tasks);
+    results.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
+    res.json({ jobs: results.slice(0, 60), errors });
   });
 
   // --- FREELANCE OFFERS ---
