@@ -38,16 +38,16 @@ export function SplitLayout({
 
   return (
     <div
-      className={cn("flex h-full min-h-0 bg-background relative overflow-hidden", className)}
+      className={cn("flex h-full min-h-0 gap-2 sm:gap-3 relative", className)}
       style={{ "--sidebar-width": widthValue } as React.CSSProperties}
     >
-      {/* Inner sidebar panel */}
+      {/* Sidebar panel */}
       <aside
         className={cn(
-          "flex flex-col shrink-0 transition-[width] duration-300 ease-in-out overflow-hidden relative p-2 pr-0",
-          !isOpen && "w-0 p-0",
+          "flex flex-col shrink-0 transition-[width] duration-300 ease-in-out overflow-hidden relative",
+          !isOpen && "w-0",
         )}
-        style={{ width: isOpen ? "calc(var(--sidebar-width) + 8px)" : "0" }}
+        style={{ width: isOpen ? "var(--sidebar-width)" : "0" }}
       >
         <div
           className={cn(
@@ -61,13 +61,14 @@ export function SplitLayout({
         </div>
       </aside>
 
-      {/* Toggle button */}
+      {/* Floating toggle button — sits between the two panels */}
       <button
         onClick={toggleSidebar}
-        className={cn(
-          "grid place-items-center absolute top-16 z-30 size-5 rounded-full border border-border/60 bg-background shadow-sm hover:bg-muted/60 hover:scale-110 active:scale-95 transition-all duration-200 group",
-          isOpen ? "left-[calc(var(--sidebar-width))]" : "left-2",
-        )}
+        className="grid place-items-center absolute top-16 z-30 size-5 rounded-full border border-border/60 bg-background shadow-sm hover:bg-muted/60 hover:scale-110 active:scale-95 transition-[transform,background-color] duration-200 group"
+        style={{
+          left: isOpen ? `calc(var(--sidebar-width) + 4px)` : "6px",
+          transition: "left 300ms ease-in-out, transform 200ms, background-color 200ms",
+        }}
         aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
       >
         {isOpen ? (
@@ -77,7 +78,10 @@ export function SplitLayout({
         )}
       </button>
 
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">{children}</main>
+      {/* Main content card */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative rounded-2xl border border-border/60 bg-card">
+        {children}
+      </main>
     </div>
   );
 }

@@ -53,7 +53,7 @@ function ProfilePage() {
   const displayedName = form.displayName || user?.name || "?";
 
   return (
-    <PageContainer className="overflow-y-auto">
+    <PageContainer>
       <PageSection>
         <PageHeader
           icon={User}
@@ -62,7 +62,7 @@ function ProfilePage() {
           description="Your Dev Studio profile and account settings."
         />
       </PageSection>
-      <div className="flex-1 p-4 sm:p-8">
+      <div className="flex-1 min-h-0 rounded-2xl border border-border/60 bg-card overflow-y-auto p-4 sm:p-8">
         <div className="max-w-[600px] mx-auto space-y-6">
 
           {/* Avatar & name preview */}

@@ -84,7 +84,7 @@ function ConnectorsPage() {
         />
       </PageSection>
 
-      <div className="flex-1 overflow-hidden pt-1">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <SplitLayout
           sidebar={
             <ConnectorsSidebar

@@ -18,6 +18,7 @@ export interface PlannerTask {
   status: TaskStatus;
   category: TaskCategory;
   order: number;
+  estimatedMinutes?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -47,3 +48,20 @@ export const CATEGORY_COLORS: Record<TaskCategory, string> = {
   freelance: "bg-teal-500/10 text-teal-600",
   personal: "bg-pink-500/10 text-pink-600",
 };
+
+export const CATEGORY_ICONS: Record<TaskCategory, string> = {
+  general: "⚡",
+  coding: "💻",
+  learning: "📚",
+  meetings: "🗓",
+  "job-search": "🔍",
+  freelance: "💼",
+  personal: "🌱",
+};
+
+export function formatMinutes(min: number): string {
+  if (min < 60) return `${min}m`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}

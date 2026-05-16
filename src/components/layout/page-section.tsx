@@ -10,13 +10,11 @@ export function PageSection({ children, className }: PageSectionProps) {
   return (
     <div
       className={cn(
-        "px-4 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-border/60 bg-background shrink-0",
+        "shrink-0 rounded-2xl border border-border/60 bg-card px-4 sm:px-5 py-3.5",
         className
       )}
     >
-      <div className="max-w-[1400px] mx-auto w-full min-w-0">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
