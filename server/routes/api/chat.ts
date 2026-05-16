@@ -3,10 +3,12 @@ import OpenAI from "openai";
 
 const router = Router();
 
-const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-});
+function getOpenAI() {
+  return new OpenAI({
+    apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+    baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  });
+}
 
 router.post("/", async (req, res) => {
   try {
@@ -16,7 +18,7 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "prompt is required" });
     }
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: config?.model || "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt || "You are an expert AI coding assistant." },
