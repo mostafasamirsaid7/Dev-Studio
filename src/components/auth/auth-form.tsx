@@ -1,9 +1,24 @@
-import { signInWithReplit } from "@replit/repl-auth";
-
 export function AuthForm() {
-  const handleLogin = async () => {
-    await signInWithReplit();
-    window.location.reload();
+  const handleLogin = () => {
+    const domain = window.location.host;
+    const authUrl = `https://replit.com/auth_with_repl_site?domain=${domain}`;
+    const width = 480;
+    const height = 640;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      authUrl,
+      "replitAuth",
+      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`,
+    );
+
+    const interval = setInterval(() => {
+      if (popup && popup.closed) {
+        clearInterval(interval);
+        window.location.reload();
+      }
+    }, 500);
   };
 
   return (
