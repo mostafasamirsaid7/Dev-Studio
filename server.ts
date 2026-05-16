@@ -2,13 +2,14 @@ import express from "express";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
+import { registerRoutes } from "./server/routes.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const isProd = process.env.NODE_ENV === "production";
 const PORT = process.env.PORT || 5000;
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
 function getReplitUser(req) {
   const userId = req.headers["x-replit-user-id"];
@@ -30,6 +31,8 @@ app.get("/api/auth/user", (req, res) => {
 app.post("/api/auth/logout", (_req, res) => {
   res.json({ ok: true });
 });
+
+registerRoutes(app);
 
 if (isProd) {
   const distPath = join(__dirname, "dist");

@@ -1,10 +1,10 @@
+type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Json } from "@/integrations/supabase/types";
 import type { FocusArea, Difficulty } from "../types/common";
 import type { Prompt, Agent, ComponentAsset, Template, Snippet, Connector, SocialDraft, MailTemplate } from "../types/tools";
 import type { InterviewQuestion } from "../types/skills";
-import * as db from "@/integrations/supabase/actions";
+import * as db from "@/lib/api";
 import { toast } from "sonner";
 import { seedPrompts, seedAgents, seedComponents, seedTemplates, seedSnippets } from "@/data/seeds/tools";
 import { seedInterviewQuestions } from "@/data/seeds/interview-core";

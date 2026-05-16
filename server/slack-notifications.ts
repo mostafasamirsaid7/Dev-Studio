@@ -11,7 +11,7 @@ interface SlackMessage {
 }
 
 export async function sendSlackNotification(message: SlackMessage): Promise<void> {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL || import.meta.env.VITE_SLACK_WEBHOOK_URL;
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
 
   if (!webhookUrl) {
     console.warn("Slack webhook URL not configured");
