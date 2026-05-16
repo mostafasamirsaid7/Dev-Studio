@@ -37,11 +37,16 @@ jobs:
           VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy dist --project-name dev-studio
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "⚠️  Cloudflare secrets not configured — skipping Cloudflare Pages deployment."
+            echo "   Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in GitHub repository secrets to enable."
+            exit 0
+          fi
+          npx wrangler pages deploy dist --project-name dev-studio
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
       - name: Notify Slack - Success
         if: success()
@@ -53,30 +58,15 @@ jobs:
               "blocks": [
                 {
                   "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "✅ Deployment Successful"
-                  }
+                  "text": { "type": "plain_text", "text": "✅ Deployment Successful" }
                 },
                 {
                   "type": "section",
                   "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Environment:*\nProduction"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\nSuccess"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Commit:*\n`${{ github.sha }}`"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Author:*\n${{ github.actor }}"
-                    }
+                    { "type": "mrkdwn", "text": "*Environment:*\nProduction" },
+                    { "type": "mrkdwn", "text": "*Status:*\nSuccess" },
+                    { "type": "mrkdwn", "text": "*Commit:*\n`${{ github.sha }}`" },
+                    { "type": "mrkdwn", "text": "*Author:*\n${{ github.actor }}" }
                   ]
                 },
                 {
@@ -84,10 +74,7 @@ jobs:
                   "elements": [
                     {
                       "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "View Deployment"
-                      },
+                      "text": { "type": "plain_text", "text": "View Deployment" },
                       "url": "https://github.com/${{ github.repository }}/deployments"
                     }
                   ]
@@ -108,30 +95,15 @@ jobs:
               "blocks": [
                 {
                   "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "❌ Deployment Failed"
-                  }
+                  "text": { "type": "plain_text", "text": "❌ Deployment Failed" }
                 },
                 {
                   "type": "section",
                   "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Environment:*\nProduction"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\nFailed"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Commit:*\n`${{ github.sha }}`"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Author:*\n${{ github.actor }}"
-                    }
+                    { "type": "mrkdwn", "text": "*Environment:*\nProduction" },
+                    { "type": "mrkdwn", "text": "*Status:*\nFailed" },
+                    { "type": "mrkdwn", "text": "*Commit:*\n`${{ github.sha }}`" },
+                    { "type": "mrkdwn", "text": "*Author:*\n${{ github.actor }}" }
                   ]
                 },
                 {
@@ -139,10 +111,7 @@ jobs:
                   "elements": [
                     {
                       "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "View Logs"
-                      },
+                      "text": { "type": "plain_text", "text": "View Logs" },
                       "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                     }
                   ]
