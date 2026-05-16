@@ -2,7 +2,7 @@
 
 Dev Studio is a personal AI development hub built with React + Express on Replit.
 
-## System Architecture
+## System Diagram
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -23,7 +23,7 @@ Dev Studio is a personal AI development hub built with React + Express on Replit
 │  /api/social-drafts        — CRUD social drafts      │
 │  /api/mail-templates       — CRUD mail templates     │
 │  /api/interview-questions  — CRUD interview Q&A      │
-│  /api/progress             — User checklist progress │
+│  /api/progress             — user checklist progress │
 └─────────────────────────┬────────────────────────────┘
                           │  Drizzle ORM
 ┌─────────────────────────▼────────────────────────────┐
@@ -36,21 +36,21 @@ Dev Studio is a personal AI development hub built with React + Express on Replit
 
 ## Authentication
 
-Users authenticate via Replit. When a user is signed in, the Replit proxy injects two headers into every request:
+Users authenticate via Replit. When signed in, the Replit proxy injects two headers into every server request:
 
 - `x-replit-user-id` — stable unique user ID
 - `x-replit-user-name` — display name
 
-The server reads these in `server.ts` → `GET /api/auth/user`. The frontend's `AuthProvider` (`src/hooks/use-auth.tsx`) fetches that endpoint on mount to establish the session. Unauthenticated requests return 401 and the app redirects to `/auth`.
+The server reads these in `GET /api/auth/user`. The frontend's `AuthProvider` (`src/hooks/use-auth.tsx`) fetches that endpoint on mount. Unauthenticated requests return 401 and the app redirects to `/auth`.
 
 ## Data Flow
 
 ```
 User action in UI
-  → Zustand store action (optimistic update)
+  → Zustand store action (optimistic update in state)
   → fetch /api/<resource>  (POST / DELETE)
   → Express route handler
-  → Drizzle query against PostgreSQL
+  → Drizzle ORM query against PostgreSQL
   → Response updates store (or rolls back on error)
   → Toast notification shown
 ```
@@ -60,7 +60,7 @@ User action in UI
 | Layer | Technology |
 |---|---|
 | Frontend framework | React 19 |
-| Routing | TanStack Router |
+| Routing | TanStack Router (file-based) |
 | Data fetching | TanStack Query |
 | State management | Zustand (persisted to localStorage) |
 | Styling | Tailwind CSS v4 + shadcn/ui |

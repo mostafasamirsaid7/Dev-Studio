@@ -101,6 +101,9 @@ export async function getConnectors(): Promise<LocalRecord[]> {
 export async function upsertConnector(c: LocalRecord): Promise<LocalRecord> {
   return apiFetch("/api/connectors", { method: "POST", body: JSON.stringify(c) });
 }
+export async function upsertConnectors(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/connectors/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
+}
 export async function deleteConnector(id: string): Promise<void> {
   await apiFetch(`/api/connectors/${id}`, { method: "DELETE" });
 }
@@ -111,6 +114,9 @@ export async function getSocialDrafts(): Promise<LocalRecord[]> {
 export async function upsertSocialDraft(d: LocalRecord): Promise<LocalRecord> {
   return apiFetch("/api/social-drafts", { method: "POST", body: JSON.stringify(d) });
 }
+export async function upsertSocialDrafts(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/social-drafts/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
+}
 export async function deleteSocialDraft(id: string): Promise<void> {
   await apiFetch(`/api/social-drafts/${id}`, { method: "DELETE" });
 }
@@ -120,6 +126,9 @@ export async function getMailTemplates(): Promise<LocalRecord[]> {
 }
 export async function upsertMailTemplate(m: LocalRecord): Promise<LocalRecord> {
   return apiFetch("/api/mail-templates", { method: "POST", body: JSON.stringify(m) });
+}
+export async function upsertMailTemplates(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/mail-templates/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
 }
 export async function deleteMailTemplate(id: string): Promise<void> {
   await apiFetch(`/api/mail-templates/${id}`, { method: "DELETE" });

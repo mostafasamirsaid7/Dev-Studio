@@ -1,77 +1,74 @@
 # Dev Studio
 
-> Personal AI Dev Hub — Save, organize, search and reuse prompts, AI agents, components, templates and snippets — your full-stack dev brain.
+> Your personal AI dev hub — save, organize, search and reuse prompts, agents, components, templates, snippets and interview prep all in one place.
 
-## Quick Start
+## Features
 
-For a complete 5-minute setup, see our **[Setup Guide](./docs/setup/README.md)**.
+- **Prompts** — versioned prompt library with variables and usage tracking
+- **AI Agents** — custom agents with system prompts, tools, and model config
+- **Components** — reusable code components with dependency tracking
+- **Templates** — project starter templates with tech stacks
+- **Snippets** — code snippets organized by language
+- **Interview Prep** — Q&A bank with difficulty levels and answer depths
+- **Tech Skills** — frontend, backend, DevOps, testing, database checklists
+- **Soft Skills** — communication and interview preparation tracks
+- **Social Drafts** — draft posts for Twitter/LinkedIn/etc.
+- **Mail Templates** — reusable email templates by channel
 
-## Documentation
+## Stack
 
-Detailed documentation is organized in the **[docs folder](./docs/README.md)**.
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, TanStack Router, TanStack Query |
+| State | Zustand (persisted to localStorage + synced to DB) |
+| Styling | Tailwind CSS v4, shadcn/ui |
+| Server | Express 5 + tsx |
+| ORM | Drizzle ORM |
+| Database | Replit PostgreSQL |
+| Build | Vite |
+| Language | TypeScript |
+
+## Running on Replit
+
+1. Open the project in Replit
+2. Click **Run** — the database is auto-provisioned and the app starts on port 5000
+3. Sign in with your Replit account
+
+## Commands
+
+```bash
+npm run dev        # Start dev server (Express + Vite)
+npm run build      # Build for production
+npm run db:push    # Push schema changes to the database
+npm run lint       # Run ESLint
+npm run format     # Run Prettier
+```
 
 ## Project Structure
 
 ```
-Dev-Studio/
-├── src/
-│   ├── routes/              # TanStack Router pages
-│   ├── components/          # React components
-│   ├── hooks/               # Custom React hooks
-│   ├── lib/                 # Utilities, types, store
-│   ├── integrations/        # External service clients
-│   └── styles.css           # Global styles
-├── public/                  # Static assets
-├── docs/                    # Documentation
-├── .github/                 # GitHub workflows and templates
-├── docker/                  # Docker configuration
-└── supabase/                # Database migrations
+server/
+  db.ts            # Drizzle ORM client
+  routes.ts        # All /api/* route handlers
+shared/
+  schema.ts        # Database schema (source of truth)
+src/
+  routes/          # TanStack Router pages
+  components/      # React components
+  hooks/           # Custom React hooks (useAuth, use-mobile)
+  lib/
+    store.ts       # Zustand store — all state & actions
+    api.ts         # REST API client
+  types/           # TypeScript type definitions
+  data/seeds/      # Initial seed data
+docs/              # Documentation
+.github/           # GitHub workflows
 ```
 
-## 🎯 Core Features
+## Documentation
 
-### Asset Management
-
-
-- **Prompts** - Versioned prompt library with variables and usage tracking
-- **AI Agents** - Custom agents with system prompts, tools, and model configuration
-- **Components** - Reusable code components with dependencies
-- **Templates** - Project templates with tech stacks
-- **Snippets** - Code snippets organized by language
-- **Interview Prep** - Q&A database with difficulty levels
-
-### Skill Development
-
-- **Tech Skills** - Frontend, Backend, DevOps, Testing, Database
-- **Soft Skills** - Interview preparation and communication
-
-## 🛠️ Development
-
-See **[Setup Guide](./docs/setup/README.md)** for detailed local development instructions and available scripts.
-
-## 🚀 Deployment & DevOps
-
-See **[Deployment Guide](./docs/deployment/README.md)** and **[DevOps Guide](./docs/devops/README.md)** for details on CI/CD, Docker, and Cloudflare Workers.
-
-## 🤝 Contributing
-
-1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Commit changes: `git commit -am 'Add feature'`
-3. Push to branch: `git push origin feature/your-feature`
-4. Open a Pull Request
-
-See [Contributing Guide](./docs/CONTRIBUTING.md) for details.
-
-## 📝 License
-
-MIT License - see LICENSE file for details
-
-## 🆘 Support
-
-- 📖 [Documentation](./docs)
-- 🐛 [Report Issues](https://github.com/firstall31-dot/Dev-Studio/issues)
-- 💬 [Discussions](https://github.com/firstall31-dot/Dev-Studio/discussions)
-
----
-
-**Built with ❤️ by ForgeDev**
+- [Setup & Commands](./docs/setup/README.md)
+- [Environment Variables](./docs/setup/ENVIRONMENT.md)
+- [Architecture](./docs/architecture/README.md)
+- [Data Models](./docs/architecture/DATA_MODELS.md)
+- [Contributing](./docs/CONTRIBUTING.md)

@@ -1,290 +1,66 @@
 # Contributing Guide
 
-Thank you for your interest in contributing to Dev Studio! This guide will help you get started.
-
-## Code of Conduct
-
-Be respectful, inclusive, and professional. We're building a welcoming community.
-
 ## Getting Started
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally
-3. **Create a feature branch** from `develop`
-4. **Make your changes**
-5. **Push to your fork**
-6. **Open a Pull Request**
+1. Fork the repository on GitHub
+2. Create a feature branch from `main`
+3. Make your changes
+4. Open a Pull Request
 
-## Development Setup
+## Branch Naming
 
-```bash
-# Clone your fork
-git clone https://github.com/your-username/Dev-Studio.git
-cd Dev-Studio
+| Type | Pattern |
+|---|---|
+| Feature | `feature/short-description` |
+| Bug fix | `fix/short-description` |
+| Docs | `docs/short-description` |
 
-# Add upstream remote
-git remote add upstream https://github.com/firstall31-dot/Dev-Studio.git
+## Commit Messages
 
-# Install dependencies
-npm install
-
-# Create feature branch
-git checkout -b feature/your-feature-name
-```
-
-## Making Changes
-
-### Code Style
-
-- Follow existing code style
-- Use TypeScript for type safety
-- Use meaningful variable names
-- Add comments for complex logic
-
-### Commit Messages
-
-Use clear, descriptive commit messages:
-
-```
-feat: add new feature
-fix: resolve bug
-docs: update documentation
-style: format code
-refactor: reorganize code
-test: add tests
-chore: update dependencies
-```
-
-Example:
+Use concise, descriptive messages with a prefix:
 
 ```
 feat: add prompt versioning
-
-- Add version history to prompts
-- Allow reverting to previous versions
-- Display version metadata in UI
+fix: resolve date serialization error
+docs: update architecture diagram
+refactor: simplify route handlers
+chore: update dependencies
 ```
 
-### Testing
+## Code Style
 
-- Write tests for new features
-- Ensure existing tests pass
-- Run linter before committing
+- TypeScript everywhere — no `any` unless unavoidable
+- Follow the existing file and folder conventions
+- Run `npm run lint` and `npm run format` before committing
+- Keep components small and focused
+
+## Before Submitting a PR
 
 ```bash
-npm run lint
-npm run test -- --run
+npm run lint       # must pass
+npx tsc --noEmit   # must pass
+npm run build      # must succeed
 ```
 
-## Pull Request Process
+## Pull Request Checklist
 
-### Before Submitting
+- [ ] Lint and type check pass
+- [ ] Build succeeds
+- [ ] No unrelated changes included
+- [ ] Documentation updated if needed
 
-1. **Update your branch** with latest changes:
+## Adding a New Asset Type
 
-   ```bash
-   git fetch upstream
-   git rebase upstream/develop
-   ```
-
-2. **Run tests and linting**:
-
-   ```bash
-   npm run lint
-   npm run test -- --run
-   npm run build
-   ```
-
-3. **Update documentation** if needed
-
-### Submitting PR
-
-1. **Push to your fork**:
-
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-2. **Open Pull Request** on GitHub
-   - Use the PR template
-   - Link related issues
-   - Describe changes clearly
-   - Add screenshots for UI changes
-
-3. **Respond to feedback**
-   - Address review comments
-   - Push additional commits
-   - Don't force push (unless requested)
-
-### PR Requirements
-
-- ✅ All tests pass
-- ✅ Code is linted
-- ✅ No TypeScript errors
-- ✅ Documentation is updated
-- ✅ Commit messages are clear
-- ✅ At least one approval
-
-## Types of Contributions
-
-### Bug Fixes
-
-1. Create issue describing the bug
-2. Create branch: `fix/bug-description`
-3. Fix the bug
-4. Add test to prevent regression
-5. Submit PR
-
-### Features
-
-1. Discuss feature in issue first
-2. Create branch: `feature/feature-name`
-3. Implement feature
-4. Add tests
-5. Update documentation
-6. Submit PR
-
-### Documentation
-
-1. Create branch: `docs/documentation-name`
-2. Update or create documentation
-3. Submit PR
-
-### Tests
-
-1. Create branch: `test/test-description`
-2. Add tests
-3. Submit PR
-
-## Project Structure
-
-```
-src/
-├── routes/          # Pages
-├── components/      # React components
-├── hooks/           # Custom hooks
-├── lib/             # Utilities and store
-└── integrations/    # External services
-
-docs/               # Documentation
-.github/            # GitHub workflows
-docker/             # Docker configuration
-```
-
-## Common Tasks
-
-### Add a New Page
-
-1. Create file in `src/routes/`
-2. Add route to router
-3. Create components as needed
-4. Update navigation if needed
-5. Add documentation
-
-### Add a New Component
-
-1. Create file in `src/components/`
-2. Export from `src/components/index.ts`
-3. Add TypeScript types
-4. Add JSDoc comments
-5. Create stories if using Storybook
-
-### Update Dependencies
-
-```bash
-# Check for updates
-npm outdated
-
-# Update specific package
-npm update package-name
-
-# Update all packages
-npm update
-
-# Test after updating
-npm run build
-npm run test -- --run
-```
-
-### Run Locally
-
-```bash
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
-
-# Format code
-npm run format
-```
-
-## Troubleshooting
-
-### Tests Failing
-
-```bash
-# Clear cache
-rm -rf node_modules package-lock.json
-npm install
-
-# Run tests
-npm run test -- --run
-```
-
-### Build Errors
-
-```bash
-# Check TypeScript
-npx tsc --noEmit
-
-# Check ESLint
-npm run lint
-
-# Clear build cache
-rm -rf dist .output .vinxi
-npm run build
-```
-
-### Git Issues
-
-```bash
-# Sync with upstream
-git fetch upstream
-git rebase upstream/develop
-
-# Undo last commit
-git reset --soft HEAD~1
-
-# Stash changes
-git stash
-```
+1. Add the table to `shared/schema.ts`
+2. Run `npm run db:push`
+3. Add CRUD routes to `server/routes.ts`
+4. Add the API calls to `src/lib/api.ts`
+5. Add state and actions to `src/lib/store.ts`
+6. Create components in `src/components/`
+7. Add a route in `src/routes/`
 
 ## Getting Help
 
-- 📖 Read [documentation](./README.md)
-- 🐛 Check [existing issues](https://github.com/firstall31-dot/Dev-Studio/issues)
-- 💬 Start a [discussion](https://github.com/firstall31-dot/Dev-Studio/discussions)
-- 📧 Contact maintainers
-
-## Recognition
-
-Contributors will be recognized in:
-
-- README.md contributors section
-- Release notes
-- GitHub contributors page
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
-
----
-
-Thank you for contributing to Dev Studio! 🎉
+- Read the [docs](./README.md)
+- Open a [GitHub issue](https://github.com/firstall31-dot/Dev-Studio/issues)
+- Start a [discussion](https://github.com/firstall31-dot/Dev-Studio/discussions)
