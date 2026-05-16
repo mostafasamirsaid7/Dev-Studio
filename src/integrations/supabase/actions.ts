@@ -5,7 +5,7 @@ type LocalRecord = Record<string, unknown>;
 const emptyList = async (): Promise<LocalRecord[]> => [];
 const passthrough = async <T extends LocalRecord>(item: T): Promise<T> => item;
 const passthroughList = async <T extends LocalRecord>(items: T[]): Promise<T[]> => items;
-const noop = async (): Promise<void> => undefined;
+const noop = async (..._args: unknown[]): Promise<void> => undefined;
 
 export async function getCurrentUser() {
   const {
@@ -89,6 +89,6 @@ export const upsertInterviewQuestions = passthroughList;
 export const deleteInterviewQuestion = noop;
 
 export const getUserProgress = emptyList;
-export async function toggleProgress() {
+export async function toggleProgress(..._args: unknown[]) {
   return undefined;
 }
