@@ -1,6 +1,7 @@
 export async function scrapeBayt(query: string, location: string, days: number): Promise<any[]> {
   const slug = query.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  const url = `https://www.bayt.com/en/international/jobs/${slug}-jobs/`;
+  const safeSlug = encodeURIComponent(slug || "all");
+  const url = new URL(`/en/international/jobs/${safeSlug}-jobs/`, "https://www.bayt.com").toString();
   const r = await fetch(url, {
     headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
