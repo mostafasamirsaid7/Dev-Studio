@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import {
   CalendarDays, Plus, CheckCircle2, Circle, Clock,
-  LayoutGrid, Archive, ChevronDown, Sparkles,
+  LayoutGrid, Archive, ChevronDown, Sparkles, Dumbbell,
 } from "lucide-react";
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
@@ -28,12 +28,13 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { SplitLayout } from "@/components/layout";
 import { PageContainer, PageSection } from "@/components/layout";
+import { ActivitiesTab } from "@/components/activities/activities-tab";
 
 export const Route = createFileRoute("/planner")({
   component: PlannerPage,
 });
 
-type Tab = "schedule" | "overview" | "backlog";
+type Tab = "schedule" | "overview" | "backlog" | "activities";
 
 function toDateStr(d: Date) { return d.toISOString().slice(0, 10); }
 function getWeekStart(d: Date) {
@@ -68,9 +69,10 @@ const STATUS_CYCLE: Record<TaskStatus, TaskStatus> = {
 };
 
 const TABS: { id: Tab; label: string; icon: typeof CalendarDays }[] = [
-  { id: "schedule", label: "Schedule", icon: CalendarDays },
-  { id: "overview", label: "Overview", icon: LayoutGrid  },
-  { id: "backlog",  label: "Backlog",  icon: Archive     },
+  { id: "schedule",   label: "Schedule",   icon: CalendarDays },
+  { id: "overview",   label: "Overview",   icon: LayoutGrid   },
+  { id: "backlog",    label: "Backlog",    icon: Archive      },
+  { id: "activities", label: "Activities", icon: Dumbbell     },
 ];
 
 /* ─────────────────────────────────────────────────────── */
@@ -596,6 +598,9 @@ export default function PlannerPage() {
               )}
             </div>
           )}
+
+          {/* ── ACTIVITIES ── */}
+          {tab === "activities" && <ActivitiesTab />}
 
         </SplitLayout>
       </div>
