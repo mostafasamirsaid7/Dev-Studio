@@ -1,6 +1,8 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { SkillTabs } from "@/components/tech-skills/skill-tabs";
 import { SkillArea } from "@/components/tech-skills/skill-area";
+import { MaterialsView } from "@/components/tech-skills/materials-view";
+import { MockChatView } from "@/components/ai-mock/mock-chat-view";
 import { PageHeader, PageContainer, PageSection } from "@/components/layout";
 import { TECH_AREAS } from "@/data/skills";
 import type { TechAreaId } from "@/types/skills";
@@ -9,7 +11,7 @@ import { z } from "zod";
 
 const searchSchema = z.object({
   tab: z
-    .enum(["frontend", "backend", "devops", "testing", "database"])
+    .enum(["frontend", "backend", "devops", "testing", "database", "materials", "ai-mock"])
     .optional()
     .default("frontend"),
 });
@@ -34,14 +36,19 @@ function TechSkillsPage() {
         <PageHeader
           icon={Code2}
           title="Technical Skills Hub"
-          description="Unified dashboard for engineering excellence and interview preparation."
           className="mb-4"
         />
         <SkillTabs />
       </PageSection>
 
       <div className="flex-1 min-h-0 overflow-hidden">
-        <SkillArea data={TECH_AREAS[tab as TechAreaId]} />
+        {tab === "materials" ? (
+          <MaterialsView />
+        ) : tab === "ai-mock" ? (
+          <MockChatView context="tech" />
+        ) : (
+          <SkillArea data={TECH_AREAS[tab as TechAreaId]} />
+        )}
       </div>
     </PageContainer>
   );
