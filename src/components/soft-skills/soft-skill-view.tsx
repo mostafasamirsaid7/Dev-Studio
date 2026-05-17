@@ -1,4 +1,4 @@
-import { Mic, Handshake } from "lucide-react";
+import { Mic, Handshake, Swords, Wifi, Terminal, GitPullRequest, RefreshCw } from "lucide-react";
 import { SkillArea } from "@/components/tech-skills/skill-area";
 import { SOFT_SKILLS_DATA } from "@/data/skills";
 
@@ -7,8 +7,20 @@ const COMMUNICATION_EXTRA_TABS = [
   { id: "negotiation", label: "Negotiation",     icon: Handshake },
 ];
 
+const TEAMWORK_EXTRA_TABS = [
+  { id: "conflict",  label: "Conflict Resolution",  icon: Swords },
+  { id: "remote",    label: "Remote Collaboration",  icon: Wifi },
+  { id: "pairing",   label: "Pair Programming",      icon: Terminal },
+  { id: "codereview",label: "Code Review Culture",   icon: GitPullRequest },
+  { id: "agile",     label: "Agile / Scrum",         icon: RefreshCw },
+];
+
 export function SoftSkillView({ activeTab }: { activeTab?: string }) {
-  const subAreaTabs = activeTab === "communication" ? COMMUNICATION_EXTRA_TABS : [];
+  const subAreaTabs =
+    activeTab === "communication" ? COMMUNICATION_EXTRA_TABS :
+    activeTab === "teamwork"      ? TEAMWORK_EXTRA_TABS :
+    [];
+
   return (
     <SkillArea
       data={SOFT_SKILLS_DATA}

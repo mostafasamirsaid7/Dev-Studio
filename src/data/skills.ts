@@ -15,6 +15,11 @@ import {
   Mic,
   Handshake,
   Brain,
+  Swords,
+  Wifi,
+  Terminal,
+  GitPullRequest,
+  RefreshCw,
 } from "lucide-react";
 
 export const TECH_AREAS: Record<TechAreaId, SkillAreaData> = {
@@ -501,9 +506,186 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
           body: "Default to 'they had a reason' instead of 'they're an idiot'. Ask before you assume — 90% of the time it's missing context, not malice.",
         },
         {
-          title: "Pair & Mob Programming",
-          body: "Two brains catch bugs and spread knowledge in real time. Rotate the driver every 15 minutes. Use it for the hardest problems, not the easiest.",
+          title: "Shared Ownership",
+          body: "The team ships the feature, not the individual. Rotate ownership of modules so no single person is a bus factor.",
         },
+      ],
+      resources: [
+        { label: "The Five Dysfunctions of a Team", url: "https://www.tablegroup.com/product/dysfunctions/", desc: "Patrick Lencioni's model for building trust and accountability." },
+        { label: "Team Topologies", url: "https://teamtopologies.com/", desc: "Organising teams for fast flow of change." },
+      ],
+    },
+    {
+      id: "conflict",
+      label: "Conflict Resolution",
+      icon: Swords,
+      color: "border-primary/40 bg-primary/10 text-primary",
+      accent: "border-primary/30",
+      tags: ["conflict", "teamwork"],
+      concepts: [
+        {
+          title: "Separate People from Problems",
+          body: "Attack the issue, not the person. 'This approach has a flaw' vs 'your idea is bad'. Keeps conversations productive.",
+        },
+        {
+          title: "Identify Interests, Not Positions",
+          body: "Ask 'why do you want that?' instead of debating 'what'. Shared interests often exist beneath opposing positions.",
+        },
+        {
+          title: "Blameless Post-Mortems",
+          body: "Focus on systems and processes that allowed a mistake, not the person who made it. Culture of learning over culture of fear.",
+        },
+        {
+          title: "The Crucial Conversation Framework",
+          body: "Notice when a conversation turns crucial (stakes + emotions + differing opinions). Create safety, share your path, explore others' paths.",
+        },
+        {
+          title: "Disagree in Private, Align in Public",
+          body: "Raise concerns before the decision is made, in the right forum. Once the team decides, present a unified front to stakeholders.",
+        },
+      ],
+      resources: [
+        { label: "Crucial Conversations", url: "https://cruciallearning.com/", desc: "Tools for high-stakes disagreements." },
+        { label: "Nonviolent Communication", url: "https://www.cnvc.org/", desc: "Empathy-first framework for resolving tension." },
+        { label: "Getting to Yes", url: "https://www.pon.harvard.edu/", desc: "Harvard negotiation project — principled conflict resolution." },
+      ],
+    },
+    {
+      id: "remote",
+      label: "Remote Collaboration",
+      icon: Wifi,
+      color: "border-primary/40 bg-primary/10 text-primary",
+      accent: "border-primary/30",
+      tags: ["remote", "async", "teamwork"],
+      concepts: [
+        {
+          title: "Async by Default",
+          body: "Write it down before scheduling a meeting. Loom + Notion + Slack threads handle 80% of communication without synchronous cost.",
+        },
+        {
+          title: "Overlap Hours Are Sacred",
+          body: "Protect shared working hours for critical discussions and pairing. Everything else is async.",
+        },
+        {
+          title: "Over-Communicate Context",
+          body: "Remote removes hallway conversations. Add 'why' to every decision. Leave a trail of context in tickets, PRs, and docs.",
+        },
+        {
+          title: "Camera On for Hard Conversations",
+          body: "Tone is lost in text. Difficult feedback, disagreements, and 1:1s deserve a video call where facial cues are visible.",
+        },
+        {
+          title: "Document Decisions, Not Just Outcomes",
+          body: "Record what you decided AND why you rejected alternatives. Future teammates won't repeat the same discussions.",
+        },
+      ],
+      resources: [
+        { label: "GitLab Remote Playbook", url: "https://handbook.gitlab.com/handbook/company/culture/all-remote/", desc: "Industry-leading async remote culture guide." },
+        { label: "Basecamp — Shape Up", url: "https://basecamp.com/shapeup", desc: "Async-first product development at scale." },
+      ],
+    },
+    {
+      id: "pairing",
+      label: "Pair Programming",
+      icon: Terminal,
+      color: "border-primary/40 bg-primary/10 text-primary",
+      accent: "border-primary/30",
+      tags: ["pairing", "mob-programming", "teamwork"],
+      concepts: [
+        {
+          title: "Driver / Navigator Pattern",
+          body: "Driver types, navigator thinks ahead and reviews. Swap every 15–25 min with a timer. Never let one person drive for an hour.",
+        },
+        {
+          title: "Strong-Style Pairing",
+          body: "'For an idea to go from your head into the computer, it must go through someone else's hands.' The navigator holds all decisions.",
+        },
+        {
+          title: "Mob Programming",
+          body: "Whole team, one keyboard, one screen. Rotate the driver every few minutes. Extreme knowledge sharing — zero bus factor.",
+        },
+        {
+          title: "When to Pair",
+          body: "Best for: complex bugs, new joiners, risky refactors, security-critical code. Skip it for: boilerplate, well-understood tasks where flow state matters.",
+        },
+        {
+          title: "Remote Pairing Setup",
+          body: "Use VS Code Live Share or Tuple. Share terminal, not just screen. Keep Slack/Discord voice open. Pre-agree on swap intervals.",
+        },
+      ],
+      resources: [
+        { label: "Tuple — Remote Pairing Tool", url: "https://tuple.app/", desc: "Best-in-class remote pair programming app." },
+        { label: "VS Code Live Share", url: "https://visualstudio.microsoft.com/services/live-share/", desc: "Real-time collaborative editing inside VS Code." },
+        { label: "Mob Programming — A Whole Team Approach", url: "https://leanpub.com/mobprogramming", desc: "The canonical book on mob programming." },
+      ],
+    },
+    {
+      id: "codereview",
+      label: "Code Review Culture",
+      icon: GitPullRequest,
+      color: "border-primary/40 bg-primary/10 text-primary",
+      accent: "border-primary/30",
+      tags: ["code-review", "pr", "teamwork"],
+      concepts: [
+        {
+          title: "Review the Code, Not the Author",
+          body: "Comment on what the code does, not why the person wrote it that way. 'This will NPE if list is null' beats 'you forgot null check'.",
+        },
+        {
+          title: "Prefix Comments with Intent",
+          body: "Use: nit (style), question, suggestion, blocking. Reviewers immediately know what requires action and what's optional.",
+        },
+        {
+          title: "Small PRs Win",
+          body: "PRs under 400 lines get thorough reviews. 800+ lines get rubber-stamped. Break large features into stacked PRs.",
+        },
+        {
+          title: "Praise Publicly",
+          body: "Leave positive comments when you see good code. 'Nice use of early return here — really clean' builds culture and morale.",
+        },
+        {
+          title: "Author's Job Before Review",
+          body: "Self-review your diff. Add PR description with context and screenshots. Link the ticket. Don't make reviewers do your homework.",
+        },
+      ],
+      resources: [
+        { label: "Google Engineering Practices", url: "https://google.github.io/eng-practices/review/", desc: "How Google approaches code review at scale." },
+        { label: "Conventional Comments", url: "https://conventionalcomments.org/", desc: "Standard prefixes for clear, actionable PR feedback." },
+      ],
+    },
+    {
+      id: "agile",
+      label: "Agile / Scrum",
+      icon: RefreshCw,
+      color: "border-primary/40 bg-primary/10 text-primary",
+      accent: "border-primary/30",
+      tags: ["agile", "scrum", "kanban", "teamwork"],
+      concepts: [
+        {
+          title: "Sprint Planning That Works",
+          body: "Only commit to what the team can actually ship. Use yesterday's velocity as the anchor. Leave 20% buffer for unplanned work.",
+        },
+        {
+          title: "Daily Standup in 3 Questions",
+          body: "What did I ship? What am I shipping today? What's blocking me? Keep it under 15 min. Parking lot longer threads.",
+        },
+        {
+          title: "Retrospectives Without Theater",
+          body: "Use Start / Stop / Continue. Write items anonymously. Pick 1–2 action items with owners — don't generate a to-do list nobody owns.",
+        },
+        {
+          title: "Definition of Done",
+          body: "Agreed criteria before a story is 'done': code reviewed, tests passing, deployed to staging, acceptance criteria met. No done without it.",
+        },
+        {
+          title: "Kanban Flow Metrics",
+          body: "Track cycle time (ticket started → shipped) and throughput (items/week). Flow metrics beat velocity for predictability.",
+        },
+      ],
+      resources: [
+        { label: "Scrum Guide", url: "https://scrumguides.org/", desc: "The official, free Scrum framework reference." },
+        { label: "Shape Up by Basecamp", url: "https://basecamp.com/shapeup", desc: "An alternative to Scrum for 6-week cycles." },
+        { label: "Accelerate (Book)", url: "https://itrevolution.com/book/accelerate/", desc: "Data-driven metrics for high-performing software teams." },
       ],
     },
     {
