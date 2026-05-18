@@ -152,7 +152,7 @@ function ProfilePage() {
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
-            Authentication is managed through your Replit account.
+            Authentication is secure and private.
           </p>
         </div>
       </div>

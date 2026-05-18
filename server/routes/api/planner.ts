@@ -3,16 +3,11 @@ import { db } from "../../db/index.js";
 import { plannerTasks } from "../../../shared/schema.js";
 import { eq, and, gte, lte } from "drizzle-orm";
 import { requireUser, stripDates, isUUID } from "../../middleware/auth.js";
-import OpenAI from "openai";
+import { getOpenAI } from "../../lib/openai.js";
 
 const router = Router();
 
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-    baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  });
-}
+
 
 function parseRow(row: any) {
   return {

@@ -50,16 +50,20 @@ if (isProd) {
     res.sendFile(join(distPath, "index.html"));
   });
 } else {
+  const hmr = process.env.REPLIT_DEV_DOMAIN
+    ? {
+        server: undefined,
+        clientPort: 443,
+        protocol: "wss" as const,
+        host: process.env.REPLIT_DEV_DOMAIN,
+        path: "/_hmr",
+      }
+    : true;
+
   const vite = await createViteServer({
     server: {
       middlewareMode: true,
-      hmr: {
-        server: undefined,
-        clientPort: 443,
-        protocol: "wss",
-        host: process.env.REPLIT_DEV_DOMAIN,
-        path: "/_hmr",
-      },
+      hmr,
     },
     appType: "spa",
   });

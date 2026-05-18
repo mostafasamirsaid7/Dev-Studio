@@ -8,18 +8,18 @@ export const createIntegrationSlice: StateCreator<ForgeState, [["zustand/persist
     const previous = get().connectors;
     set((s) => ({
       connectors: s.connectors.some(x => x.id === conn.id)
-        ? s.connectors.map((x: any) => x.id === conn.id ? conn : x)
+        ? s.connectors.map((x) => x.id === conn.id ? conn : x)
         : [conn, ...s.connectors]
     }));
     try {
-      const saved = await db.upsertConnector({ ...conn, user_id: '', type: conn.type as any } as any);
+      const saved = await db.upsertConnector({ ...conn, user_id: '', type: conn.type as "github" | "gitlab" | "jira" | "notion" | "linear" | "slack" | "figma" | "sentry" | "postgres" | "vercel" | "redis" | "aws" | "docker" } as Parameters<typeof db.upsertConnector>[0]);
       if (saved?.id && saved.id !== conn.id) {
         set((s) => ({ connectors: s.connectors.map(x => x.id === conn.id ? { ...x, id: saved.id as string } : x) }));
       }
       toast.success('Connector saved!');
-    } catch (err: any) {
+    } catch (err) {
       set({ connectors: previous });
-      toast.error(`Failed to save: ${err.message}`);
+      toast.error(`Failed to save: ${(err as Error).message}`);
     }
   },
   deleteConnector: async (id) => {
@@ -32,8 +32,7 @@ export const createIntegrationSlice: StateCreator<ForgeState, [["zustand/persist
         loading: 'Deleting connector...',
         success: 'Connector deleted!',
         error: (err) => {
-          set({ connectors: previous });
-          return `Failed to delete: ${err.message}`;
+          return `Failed to delete: ${(err as Error).message}`;
         }
       }
     );
@@ -43,37 +42,36 @@ export const createIntegrationSlice: StateCreator<ForgeState, [["zustand/persist
     const previous = get().socialDrafts;
     set((s) => ({
       socialDrafts: s.socialDrafts.some(x => x.id === draft.id)
-        ? s.socialDrafts.map((x: any) => x.id === draft.id ? draft : x)
+        ? s.socialDrafts.map((x) => x.id === draft.id ? draft : x)
         : [draft, ...s.socialDrafts]
     }));
     try {
       const saved = await db.upsertSocialDraft({ 
         ...draft, 
         user_id: '', 
-        platform: draft.platform as any,
+        platform: draft.platform as "twitter" | "linkedin" | "devto" | "medium" | "hashnode" | "github",
         media_urls: draft.mediaUrls 
-      } as any);
+      } as Parameters<typeof db.upsertSocialDraft>[0]);
       if (saved?.id && saved.id !== draft.id) {
         set((s) => ({ socialDrafts: s.socialDrafts.map(x => x.id === draft.id ? { ...x, id: saved.id as string } : x) }));
       }
       toast.success('Draft saved!');
-    } catch (err: any) {
+    } catch (err) {
       set({ socialDrafts: previous });
-      toast.error(`Failed to save: ${err.message}`);
+      toast.error(`Failed to save: ${(err as Error).message}`);
     }
   },
   deleteSocialDraft: async (id) => {
     const previous = get().socialDrafts;
     set((s) => ({ socialDrafts: s.socialDrafts.filter(x => x.id !== id) }));
 
-    toast.promise(
+    await toast.promise(
       db.deleteSocialDraft(id),
       {
         loading: 'Deleting draft...',
         success: 'Draft deleted!',
         error: (err) => {
-          set({ socialDrafts: previous });
-          return `Failed to delete: ${err.message}`;
+          return `Failed to delete: ${(err as Error).message}`;
         }
       }
     );
@@ -83,36 +81,35 @@ export const createIntegrationSlice: StateCreator<ForgeState, [["zustand/persist
     const previous = get().mailTemplates;
     set((s) => ({
       mailTemplates: s.mailTemplates.some(x => x.id === mail.id)
-        ? s.mailTemplates.map((x: any) => x.id === mail.id ? mail : x)
+        ? s.mailTemplates.map((x) => x.id === mail.id ? mail : x)
         : [mail, ...s.mailTemplates]
     }));
     try {
       const saved = await db.upsertMailTemplate({ 
         ...mail, 
         user_id: '', 
-        channel: mail.channel as any 
-      } as any);
+        channel: mail.channel as "slack" | "email" | "discord" | "telegram" 
+      } as Parameters<typeof db.upsertMailTemplate>[0]);
       if (saved?.id && saved.id !== mail.id) {
         set((s) => ({ mailTemplates: s.mailTemplates.map(x => x.id === mail.id ? { ...x, id: saved.id as string } : x) }));
       }
       toast.success('Mail template saved!');
-    } catch (err: any) {
+    } catch (err) {
       set({ mailTemplates: previous });
-      toast.error(`Failed to save: ${err.message}`);
+      toast.error(`Failed to save: ${(err as Error).message}`);
     }
   },
   deleteMailTemplate: async (id) => {
     const previous = get().mailTemplates;
     set((s) => ({ mailTemplates: s.mailTemplates.filter(x => x.id !== id) }));
 
-    toast.promise(
+    await toast.promise(
       db.deleteMailTemplate(id),
       {
         loading: 'Deleting template...',
         success: 'Template deleted!',
         error: (err) => {
-          set({ mailTemplates: previous });
-          return `Failed to delete: ${err.message}`;
+          return `Failed to delete: ${(err as Error).message}`;
         }
       }
     );

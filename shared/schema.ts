@@ -6,3 +6,5 @@ export * from "./schema/profile.js";
 export * from "./schema/auth.js";
 export * from "./schema/cv.js";
 export * from "./schema/planner.js";
+export * from "./schema/chat.js";
+

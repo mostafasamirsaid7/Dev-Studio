@@ -1,14 +1,8 @@
 import { Router, Request, Response } from "express";
-import OpenAI from "openai";
+import { getOpenAI } from "../../lib/openai.js";
 
 const router = Router();
 
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-    baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  });
-}
 
 router.post("/", async (req: Request, res: Response) => {
   try {
