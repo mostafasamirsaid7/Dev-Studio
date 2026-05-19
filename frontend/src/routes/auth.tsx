@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { AuthLayout } from "@/components/auth/auth-layout";
-import { AuthForm } from "@/components/auth/auth-form";
+import { AuthLayout } from "@/features/auth/auth-layout";
+import { AuthForm } from "@/features/auth/auth-form";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({

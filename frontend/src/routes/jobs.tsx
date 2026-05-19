@@ -5,13 +5,13 @@ import { toast } from "sonner";
 import { PageContainer, PageHeader, PageSection, TabNav } from "@/components/layout";
 import { SplitLayout } from "@/components/layout/split-layout";
 import { Briefcase } from "lucide-react";
-import { JobsSidebar } from "@/components/jobs/jobs-sidebar";
-import { JobEditor } from "@/components/jobs/job-editor";
-import { OffersSidebar } from "@/components/jobs/offers-sidebar";
-import { OfferEditor } from "@/components/jobs/offer-editor";
-import { ServicesSidebar } from "@/components/jobs/services-sidebar";
-import { ServiceEditor } from "@/components/jobs/service-editor";
-import type { SavedJob, FreelanceOffer, MyService } from "@/components/jobs/types";
+import { JobsSidebar } from "@/features/jobs/jobs-sidebar";
+import { JobEditor } from "@/features/jobs/job-editor";
+import { OffersSidebar } from "@/features/jobs/offers-sidebar";
+import { OfferEditor } from "@/features/jobs/offer-editor";
+import { ServicesSidebar } from "@/features/jobs/services-sidebar";
+import { ServiceEditor } from "@/features/jobs/service-editor";
+import type { SavedJob, FreelanceOffer, MyService } from "@/features/jobs/types";
 
 const searchSchema = z.object({ tab: z.enum(["jobs", "offers", "services"]).optional() });
 

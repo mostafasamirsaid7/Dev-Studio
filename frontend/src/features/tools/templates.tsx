@@ -7,7 +7,7 @@ import { LayoutTemplate, Plus, Trash2, Search, Check, ListTree, StickyNote } fro
 import { toast } from "sonner";
 import type { Template } from "@/types/tools";
 import { Field, Input, TextArea } from "./shared";
-import { SplitLayout } from "../layout";
+import { SplitLayout } from "../../components/layout";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function Templates({ selectedId }: { selectedId?: string }) {

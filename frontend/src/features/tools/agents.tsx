@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SplitLayout } from "../layout";
+import { SplitLayout } from "../../components/layout";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function Agents({ selectedId }: { selectedId?: string }) {

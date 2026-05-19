@@ -1,6 +1,6 @@
 import { Save, Image as ImageIcon, Hash } from "lucide-react";
 import type { SocialDraft } from "@/types/tools";
-import { Input, TextArea } from "@/components/tools/shared";
+import { Input, TextArea } from "@/features/tools/shared";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

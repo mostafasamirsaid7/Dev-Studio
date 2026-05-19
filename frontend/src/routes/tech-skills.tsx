@@ -1,8 +1,8 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
-import { SkillTabs } from "@/components/tech-skills/skill-tabs";
-import { SkillArea } from "@/components/tech-skills/skill-area";
-import { MaterialsView } from "@/components/tech-skills/materials-view";
-import { MockChatView } from "@/components/ai-mock/mock-chat-view";
+import { SkillTabs } from "@/features/tech-skills/skill-tabs";
+import { SkillArea } from "@/features/tech-skills/skill-area";
+import { MaterialsView } from "@/features/tech-skills/materials-view";
+import { MockChatView } from "@/features/ai-mock/mock-chat-view";
 import { PageHeader, PageContainer, PageSection } from "@/components/layout";
 import { TECH_AREAS } from "@/data/tech";
 import type { TechAreaId } from "@/types/skills";

@@ -29,12 +29,12 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { PlannerSidebar } from "@/components/planner/planner-sidebar";
-import { TaskCard } from "@/components/planner/task-card";
-import { AddTaskForm } from "@/components/planner/add-task-form";
-import { EditTaskDialog } from "@/components/planner/edit-task-dialog";
-import { AISuggestionsPanel } from "@/components/planner/ai-suggestions-panel";
-import { OverviewPanel } from "@/components/planner/overview-panel";
+import { PlannerSidebar } from "@/features/planner/planner-sidebar";
+import { TaskCard } from "@/features/planner/task-card";
+import { AddTaskForm } from "@/features/planner/add-task-form";
+import { EditTaskDialog } from "@/features/planner/edit-task-dialog";
+import { AISuggestionsPanel } from "@/features/planner/ai-suggestions-panel";
+import { OverviewPanel } from "@/features/planner/overview-panel";
 import { getPlannerTasks, upsertPlannerTask, deletePlannerTask } from "@/lib/api/planner";
 import type { PlannerTask, TaskStatus, TaskCategory } from "@/types/planner";
 import {
@@ -48,7 +48,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { SplitLayout } from "@/components/layout";
 import { PageContainer, PageSection } from "@/components/layout";
-import { ActivitiesTab, WorkingTab, LearningTab } from "@/components/activities/activities-tab";
+import { ActivitiesTab, WorkingTab, LearningTab } from "@/features/activities/activities-tab";
 
 export const Route = createFileRoute("/planner")({
   component: PlannerPage,

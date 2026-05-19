@@ -1,5 +1,5 @@
 import type { CVPersonalInfo } from "@/types/cv";
-import { Input } from "@/components/tools/shared";
+import { Input } from "@/features/tools/shared";
 
 interface CVPersonalProps {
   data: CVPersonalInfo;

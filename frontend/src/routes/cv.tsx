@@ -4,8 +4,8 @@ import { PageContainer, PageSection, PageHeader, TabNav, SplitLayout } from "@/c
 import { FileText, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForge, newId } from "@/lib/store";
-import { CVSidebar } from "@/components/cv/cv-sidebar";
-import { CVBuilder } from "@/components/cv/cv-builder";
+import { CVSidebar } from "@/features/cv/cv-sidebar";
+import { CVBuilder } from "@/features/cv/cv-builder";
 import type { CVProfile } from "@/types/cv";
 import { BUILDER_TABS } from "@/constants";
 

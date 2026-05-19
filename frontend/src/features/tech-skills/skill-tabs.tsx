@@ -1,5 +1,5 @@
 import { useSearch } from "@tanstack/react-router";
-import { TabNav } from "../layout";
+import { TabNav } from "../../components/layout";
 import { TECH_SKILL_TABS } from "@/constants";
 
 export function SkillTabs() {

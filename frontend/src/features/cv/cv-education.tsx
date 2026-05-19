@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Trash2, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 import type { CVEducation } from "@/types/cv";
-import { Input } from "@/components/tools/shared";
+import { Input } from "@/features/tools/shared";
 
 interface CVEducationProps {
   data: CVEducation[];

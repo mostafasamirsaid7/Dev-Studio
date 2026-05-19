@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { CommandPalette } from "./command-palette";
 import { ErrorBoundary } from "./error-boundary";
-import { UserMenu } from "@/components/auth/user-menu";
+import { UserMenu } from "@/features/auth/user-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";

@@ -1,6 +1,6 @@
 import { Save } from "lucide-react";
 import type { MailTemplate } from "@/types/tools";
-import { Input, TextArea } from "@/components/tools/shared";
+import { Input, TextArea } from "@/features/tools/shared";
 import {
   Select,
   SelectContent,

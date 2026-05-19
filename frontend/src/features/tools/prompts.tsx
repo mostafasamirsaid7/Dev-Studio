@@ -7,7 +7,7 @@ import { Sparkles, Star, Copy, Plus, Trash2, History, Wand2, Search } from "luci
 import { toast } from "sonner";
 import type { Prompt } from "@/types/tools";
 import { Field, Input, TextArea } from "./shared";
-import { SplitLayout } from "../layout";
+import { SplitLayout } from "../../components/layout";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function Prompts({ selectedId }: { selectedId?: string }) {

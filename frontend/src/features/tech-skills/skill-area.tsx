@@ -14,7 +14,7 @@ import { OverviewSection } from "./overview-section";
 import { ChecklistSection } from "./checklist-section";
 import { InterviewSection } from "./interview-section";
 import { ResourcesSection } from "./resources-section";
-import { SplitLayout, TabNav } from "../layout";
+import { SplitLayout, TabNav } from "../../components/layout";
 import { cn } from "@/lib/utils";
 
 type SectionId = "overview" | "checklist" | "interview" | "resources";

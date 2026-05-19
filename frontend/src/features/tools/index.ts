@@ -1,4 +1,4 @@
-// Tools components barrel — import from "@/components/tools"
+// Tools components barrel — import from "@/features/tools"
 export { Prompts } from "./prompts";
 export { Agents } from "./agents";
 export { Components } from "./components";

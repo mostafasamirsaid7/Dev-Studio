@@ -1,6 +1,6 @@
 import { Save, Mail, Phone, User } from "lucide-react";
 import type { Connector } from "@/types/tools";
-import { Input, TextArea } from "@/components/tools/shared";
+import { Input, TextArea } from "@/features/tools/shared";
 import { Button } from "@/components/ui/button";
 
 interface ConnectorEditorProps {

@@ -7,7 +7,7 @@ import { Scissors, Plus, Trash2, Search, Copy } from "lucide-react";
 import { toast } from "sonner";
 import type { Snippet } from "@/types/tools";
 import { Field, Input, TextArea } from "./shared";
-import { SplitLayout } from "../layout";
+import { SplitLayout } from "../../components/layout";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function Snippets({ selectedId }: { selectedId?: string }) {

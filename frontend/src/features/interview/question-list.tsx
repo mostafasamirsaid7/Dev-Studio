@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { usePagination } from "@/hooks/use-pagination";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { Search, ChevronRight, Sparkles, Plus, GraduationCap } from "lucide-react";
-import { SplitLayout } from "../layout";
+import { SplitLayout } from "../../components/layout";
 import { useForge } from "@/lib/store";
 import { QAEditorDialog } from "./qa-editor-dialog";
 import type { FocusArea } from "@/types/common";

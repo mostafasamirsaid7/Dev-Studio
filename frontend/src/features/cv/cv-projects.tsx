@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import type { CVProject } from "@/types/cv";
-import { Input } from "@/components/tools/shared";
+import { Input } from "@/features/tools/shared";
 
 interface CVProjectsProps {
   data: CVProject[];

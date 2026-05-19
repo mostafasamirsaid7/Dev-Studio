@@ -4,8 +4,8 @@ import { PageHeader, PageContainer, PageSection, TabNav, SplitLayout } from "@/c
 import { Share2 } from "lucide-react";
 import { z } from "zod";
 import { useForge, newId } from "@/lib/store";
-import { SocialSidebar } from "@/components/social/social-sidebar";
-import { PostEditor } from "@/components/social/post-editor";
+import { SocialSidebar } from "@/features/social/social-sidebar";
+import { PostEditor } from "@/features/social/post-editor";
 import type { SocialDraft } from "@/types/tools";
 import { SOCIAL_TABS } from "@/constants";
 import { SocialPlatform } from "@shared/enums";

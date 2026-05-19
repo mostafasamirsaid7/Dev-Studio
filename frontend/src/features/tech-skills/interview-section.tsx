@@ -1,9 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { Search, Plus } from "lucide-react";
 import { useForge } from "@/lib/store";
-import { QACard } from "@/components/interview/qa-card";
-import { QAEditorDialog } from "@/components/interview/qa-editor-dialog";
-import { Input } from "@/components/tools/shared";
+import { QACard } from "@/features/interview/qa-card";
+import { QAEditorDialog } from "@/features/interview/qa-editor-dialog";
+import { Input } from "@/features/tools/shared";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FocusArea } from "@/types/common";
 import type { SkillAreaData, InterviewQuestion } from "@/types/skills";

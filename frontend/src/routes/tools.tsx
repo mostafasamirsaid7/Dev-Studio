@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, PageContainer, PageSection, TabNav } from "@/components/layout";
 import { Package } from "lucide-react";
-import { Prompts } from "@/components/tools/prompts";
-import { Agents } from "@/components/tools/agents";
-import { Components } from "@/components/tools/components";
-import { Templates } from "@/components/tools/templates";
-import { Snippets } from "@/components/tools/snippets";
+import { Prompts } from "@/features/tools/prompts";
+import { Agents } from "@/features/tools/agents";
+import { Components } from "@/features/tools/components";
+import { Templates } from "@/features/tools/templates";
+import { Snippets } from "@/features/tools/snippets";
 import { TOOLS_TABS } from "@/constants";
 
 type ToolTab = "prompts" | "agents" | "components" | "templates" | "snippets";

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Plus, Trash2, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 import { useForge, newId } from "@/lib/store";
-import { Input, TextArea } from "@/components/tools/shared";
+import { Input, TextArea } from "@/features/tools/shared";
 import {
   Select,
   SelectContent,

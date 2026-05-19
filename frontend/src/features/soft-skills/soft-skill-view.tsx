@@ -10,7 +10,7 @@ import {
   Brain,
   Repeat2,
 } from "lucide-react";
-import { SkillArea } from "@/components/tech-skills/skill-area";
+import { SkillArea } from "@/features/tech-skills/skill-area";
 import { SOFT_SKILLS_DATA } from "@/data/soft";
 
 export const SOFT_SKILL_GROUPS: Record<string, { id: string; label: string; icon: any }[]> = {

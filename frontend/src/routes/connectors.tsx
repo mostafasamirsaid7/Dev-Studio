@@ -4,8 +4,8 @@ import { PageHeader, PageContainer, PageSection, TabNav, SplitLayout } from "@/c
 import { Users } from "lucide-react";
 import { z } from "zod";
 import { useForge, newId } from "@/lib/store";
-import { ConnectorsSidebar } from "@/components/connectors/connectors-sidebar";
-import { ConnectorEditor } from "@/components/connectors/connector-editor";
+import { ConnectorsSidebar } from "@/features/connectors/connectors-sidebar";
+import { ConnectorEditor } from "@/features/connectors/connector-editor";
 import type { Connector } from "@/types/tools";
 import { CONNECTORS_TABS } from "@/constants";
 import { ConnectorType } from "@shared/enums";
