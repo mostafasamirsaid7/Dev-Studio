@@ -17,7 +17,7 @@ export const create = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const data = await myServicesService.create(uid, req.body);
+    const data = await myServicesService.upsert(uid, req.body);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: "Failed to create service" });

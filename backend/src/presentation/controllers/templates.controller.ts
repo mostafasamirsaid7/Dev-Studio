@@ -17,7 +17,7 @@ export const create = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const result = await templatesService.create(uid, req.body);
+    const result = await templatesService.upsert(uid, req.body);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to create template" });
@@ -29,7 +29,7 @@ export const createBulk = async (req: Request, res: Response) => {
   if (!uid) return;
   try {
     const items = Array.isArray(req.body) ? req.body : [];
-    const result = await templatesService.createBulk(uid, items);
+    const result = await templatesService.upsertBulk(uid, items);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to create bulk templates" });

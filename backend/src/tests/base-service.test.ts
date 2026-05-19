@@ -4,7 +4,7 @@ import { IUnitOfWork } from "../domain/repositories/unit-of-work.interface.js";
 
 // ─── Minimal mock repository ──────────────────────────────────────────────────
 
-function makeRepo(overrides: Partial<ReturnType<typeof makeRepo>> = {}) {
+function makeRepo(overrides: Record<string, any> = {}) {
   return {
     findByUserId: vi.fn().mockResolvedValue([]),
     findByUserAndId: vi.fn().mockResolvedValue([]),
@@ -25,12 +25,12 @@ function makeRepo(overrides: Partial<ReturnType<typeof makeRepo>> = {}) {
 // ─── Concrete subclass for testing ──────────────────────────────────────────
 
 class TestService extends BaseService {
-  public repo: ReturnType<typeof makeRepo>;
+  public mockRepo: ReturnType<typeof makeRepo>;
 
   constructor(repo: ReturnType<typeof makeRepo>) {
     const fakeUow = {} as IUnitOfWork;
     super(fakeUow, () => repo as any);
-    this.repo = repo;
+    this.mockRepo = repo;
   }
 }
 

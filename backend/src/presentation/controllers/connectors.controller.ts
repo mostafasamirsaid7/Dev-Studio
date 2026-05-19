@@ -17,7 +17,7 @@ export const create = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const result = await connectorsService.create(uid, req.body);
+    const result = await connectorsService.upsert(uid, req.body);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to create connector" });
@@ -29,7 +29,7 @@ export const createBulk = async (req: Request, res: Response) => {
   if (!uid) return;
   try {
     const items = Array.isArray(req.body) ? req.body : [];
-    const result = await connectorsService.createBulk(uid, items);
+    const result = await connectorsService.upsertBulk(uid, items);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to create bulk connectors" });

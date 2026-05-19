@@ -17,7 +17,7 @@ export const create = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const result = await offersService.create(uid, req.body);
+    const result = await offersService.upsert(uid, req.body);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to create offer" });

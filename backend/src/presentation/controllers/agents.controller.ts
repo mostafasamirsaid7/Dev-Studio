@@ -17,7 +17,7 @@ export const create = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const result = await agentsService.create(uid, req.body);
+    const result = await agentsService.upsert(uid, req.body);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to create agent" });
@@ -29,7 +29,7 @@ export const createBulk = async (req: Request, res: Response) => {
   if (!uid) return;
   try {
     const items = Array.isArray(req.body) ? req.body : [];
-    const result = await agentsService.createBulk(uid, items);
+    const result = await agentsService.upsertBulk(uid, items);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to create bulk agents" });

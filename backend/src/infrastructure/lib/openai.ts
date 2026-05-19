@@ -4,14 +4,11 @@ let openaiInstance: OpenAI | null = null;
 
 /**
  * Returns a configured instance of the OpenAI client.
- * Prioritizes standard local environment variables (OPENAI_API_KEY, OPENAI_BASE_URL)
- * and falls back to Replit's integration environment variables.
+ * Prioritizes standard local environment variables (OPENAI_API_KEY, OPENAI_BASE_URL).
  */
 export function getOpenAI(): OpenAI {
-  const apiKey =
-    process.env.OPENAI_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
-  const baseURL =
-    process.env.OPENAI_BASE_URL || process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+  const apiKey = process.env.OPENAI_API_KEY;
+  const baseURL = process.env.OPENAI_BASE_URL;
 
   if (!apiKey) {
     throw new Error(
