@@ -1,9 +1,6 @@
-import { Router, Request, Response } from "express";
+import { Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
-import { validateBody, validateQuery, validateParams } from "../middleware/validation.js";
 import { jobsService } from "../../infrastructure/di/container.js";
-import { SavedJobDto, RemoteJobsQueryDto, ScrapeJobsQueryDto } from "../dtos/career.dto.js";
-import { IdParamDto } from "../dtos/common.dto.js";
 
 export const getSaved = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -67,12 +64,3 @@ export const getScrape = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to scrape jobs" });
   }
 };
-
-const router = Router();
-router.get("/saved", getSaved);
-router.post("/saved", validateBody(SavedJobDto), postSaved);
-router.delete("/saved/:id", validateParams(IdParamDto), deleteSavedById);
-router.get("/remote", validateQuery(RemoteJobsQueryDto), getRemote);
-router.get("/scrape", validateQuery(ScrapeJobsQueryDto), getScrape);
-export default router;
-

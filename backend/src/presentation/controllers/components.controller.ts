@@ -1,10 +1,6 @@
-import { Router, Request, Response } from "express";
+import { Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
-import { validateBody, validateParams } from "../middleware/validation.js";
 import { componentsService } from "../../infrastructure/di/container.js";
-import { ComponentDto } from "../dtos/core.dto.js";
-import { IdParamDto } from "../dtos/common.dto.js";
-import { z } from "zod";
 
 export const getAll = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -51,11 +47,3 @@ export const deleteById = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to delete component" });
   }
 };
-
-const router = Router();
-router.get("/", getAll);
-router.post("/", validateBody(ComponentDto), create);
-router.post("/bulk", validateBody(z.array(ComponentDto)), createBulk);
-router.delete("/:id", validateParams(IdParamDto), deleteById);
-export default router;
-

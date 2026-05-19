@@ -283,39 +283,3 @@ export function setupGooglePassport() {
     done(null, user ?? null);
   });
 }
-
-// --- Router ---
-
-import { authLimiter } from "../config/rate-limit.js";
-
-const router = Router();
-router.use(authLimiter);
-router.post("/register", validateBody(RegisterDto), register);
-router.post("/login", validateBody(LoginDto), login);
-router.post("/verify-email", validateBody(VerifyEmailDto), verifyEmail);
-router.post("/resend-verification", validateBody(ResendVerificationDto), resendVerification);
-router.post("/logout", logout);
-router.get("/user", getUser);
-router.get("/config", getConfig);
-
-router.get("/google", (req: Request, res: Response, next: NextFunction) => {
-  const clientID = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  if (!clientID || !clientSecret)
-    return res.redirect("/auth?error=google_not_configured");
-  passport.authenticate("google", {
-    session: false,
-    scope: ["profile", "email"],
-  })(req, res, next);
-});
-
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: "/auth?error=google_failed",
-  }),
-  googleCallback,
-);
-
-export default router;

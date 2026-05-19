@@ -1,8 +1,5 @@
-import { Router, Request, Response } from "express";
-import { requireUser } from "../middleware/auth.js";
-import { validateBody, validateParams } from "../middleware/validation.js";
+import { Request, Response } from "express";
 import { chatService } from "../../infrastructure/di/container.js";
-import { ChatDto } from "../dtos/chat.dto.js";
 
 export const create = async (req: Request, res: Response) => {
   try {
@@ -21,7 +18,3 @@ export const create = async (req: Request, res: Response) => {
       .json({ error: errorMessage });
   }
 };
-
-const router = Router();
-router.post("/completions", validateBody(ChatDto), create);
-export default router;

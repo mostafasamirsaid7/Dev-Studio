@@ -1,10 +1,6 @@
-import { Router, Request, Response } from "express";
+import { Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
-import { validateBody, validateParams } from "../middleware/validation.js";
 import { cvService } from "../../infrastructure/di/container.js";
-import { CvProfileDto, AtsCheckDto, ParsePdfDto } from "../dtos/cv.dto.js";
-import { IdParamDto } from "../dtos/common.dto.js";
-
 
 export const getAll = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -68,12 +64,3 @@ export const postParsePdf = async (req: Request, res: Response) => {
       .json({ error: msg });
   }
 };
-
-const router = Router();
-router.get("/", getAll);
-router.post("/", validateBody(CvProfileDto), create);
-router.delete("/:id", validateParams(IdParamDto), deleteById);
-router.post("/ats-check", validateBody(AtsCheckDto), postAtsCheck);
-router.post("/parse-pdf", validateBody(ParsePdfDto), postParsePdf);
-export default router;
-

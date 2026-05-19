@@ -1,8 +1,6 @@
-import { Router, Request, Response } from "express";
+import { Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
-import { validateBody, validateParams } from "../middleware/validation.js";
 import { profileService } from "../../infrastructure/di/container.js";
-import { ProfileDto } from "../dtos/profile.dto.js";
 
 export const getAll = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -30,9 +28,3 @@ export const create = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to update profile" });
   }
 };
-
-const router = Router();
-router.get("/", getAll);
-router.post("/", validateBody(ProfileDto), create);
-export default router;
-

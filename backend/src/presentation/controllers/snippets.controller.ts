@@ -1,11 +1,6 @@
-import { Router, Request, Response } from "express";
+import { Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
-import { validateBody, validateParams } from "../middleware/validation.js";
 import { snippetsService } from "../../infrastructure/di/container.js";
-import { SnippetDto } from "../dtos/core.dto.js";
-import { z } from "zod";
-import { IdParamDto } from "../dtos/common.dto.js";
-
 
 export const getAll = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -52,11 +47,3 @@ export const deleteById = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to delete snippet" });
   }
 };
-
-const router = Router();
-router.get("/", getAll);
-router.post("/", validateBody(SnippetDto), create);
-router.post("/bulk", validateBody(z.array(SnippetDto)), createBulk);
-router.delete("/:id", validateParams(IdParamDto), deleteById);
-export default router;
-
