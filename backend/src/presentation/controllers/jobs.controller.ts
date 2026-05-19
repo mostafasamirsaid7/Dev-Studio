@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
 import { validateBody, validateQuery, validateParams } from "../middleware/validation.js";
-import { JobsService } from "../../application/services/jobs.service.js";
+import { jobsService } from "../../infrastructure/di/container.js";
 import { SavedJobDto, RemoteJobsQueryDto, ScrapeJobsQueryDto } from "../dtos/career.dto.js";
 import { IdParamDto } from "../dtos/common.dto.js";
 
@@ -9,7 +9,7 @@ export const getSaved = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const data = await JobsService.getSaved(uid);
+    const data = await jobsService.getSaved(uid);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch saved jobs" });
@@ -20,7 +20,7 @@ export const postSaved = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const result = await JobsService.saveJob(uid, req.body);
+    const result = await jobsService.saveJob(uid, req.body);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to save job" });
@@ -32,7 +32,7 @@ export const deleteSavedById = async (req: Request, res: Response) => {
   if (!uid) return;
   try {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    await JobsService.deleteSavedById(uid, id);
+    await jobsService.deleteSavedById(uid, id);
     res.json({ ok: true });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete saved job" });
@@ -42,7 +42,7 @@ export const deleteSavedById = async (req: Request, res: Response) => {
 export const getRemote = async (req: Request, res: Response) => {
   try {
     const tag = String(req.query.tag || "");
-    const data = await JobsService.getRemoteJobs(tag);
+    const data = await jobsService.getRemoteJobs(tag);
     res.json(data);
   } catch {
     res.status(502).json({ error: "Failed to fetch remote jobs" });
@@ -61,7 +61,7 @@ export const getScrape = async (req: Request, res: Response) => {
       .map((s) => s.trim())
       .filter(Boolean);
 
-    const result = await JobsService.scrapeJobs(query, location, days, sources);
+    const result = await jobsService.scrapeJobs(query, location, days, sources);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to scrape jobs" });
@@ -75,3 +75,4 @@ router.delete("/saved/:id", validateParams(IdParamDto), deleteSavedById);
 router.get("/remote", validateQuery(RemoteJobsQueryDto), getRemote);
 router.get("/scrape", validateQuery(ScrapeJobsQueryDto), getScrape);
 export default router;
+

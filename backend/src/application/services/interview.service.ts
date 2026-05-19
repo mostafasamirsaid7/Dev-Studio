@@ -1,35 +1,26 @@
-
-import { interviewQuestions, userProgress } from "../../domain/schema.js";
-import { eq, and, or } from "drizzle-orm";
 import { stripDates, isUUID } from "../../domain/utils.js";
-import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
+import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
 
 export class InterviewService {
-  // NOTE: or(isGlobal, userId) is a domain-specific query that cannot be
-  // expressed through generic repository methods. This is an acceptable
-  // use of findAll(filter) until a dedicated InterviewRepository is created.
-  static async getQuestions(userId: string) {
-    return await uow.interviewQuestions.findAll(
-      or(
-        eq(interviewQuestions.isGlobal, true),
-        eq(interviewQuestions.userId, userId),
-      )
-    );
+  constructor(private uow: IUnitOfWork) {}
+
+  async getQuestions(userId: string) {
+    return await this.uow.interviewQuestions.findGlobalAndUserQuestions(userId);
   }
 
-  static async createQuestion(userId: string, rawData: any) {
+  async createQuestion(userId: string, rawData: any) {
     const { id, ...raw } = rawData;
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? [await uow.interviewQuestions.findById(safeId)].filter(Boolean)
+      ? [await this.uow.interviewQuestions.findById(safeId)].filter(Boolean)
       : [];
 
     if (existing.length > 0 && existing[0].userId === userId) {
-      const r = await uow.interviewQuestions.update(safeId!, data);
+      const r = await this.uow.interviewQuestions.update(safeId!, data);
       return r;
     } else {
-      const r = await uow.interviewQuestions.create({
+      const r = await this.uow.interviewQuestions.create({
         ...data,
         userId,
         ...(safeId ? { id: safeId } : {}),
@@ -38,7 +29,7 @@ export class InterviewService {
     }
   }
 
-  static async createQuestionsBulk(userId: string, items: any[]) {
+  async createQuestionsBulk(userId: string, items: any[]) {
     if (!items.length) {
       return [];
     }
@@ -48,44 +39,41 @@ export class InterviewService {
       return { ...data, userId, ...(safeId ? { id: safeId } : {}) } as any;
     });
 
-    return await uow.interviewQuestions.createMany(values);
+    return await this.uow.interviewQuestions.createMany(values);
   }
 
-  static async deleteQuestionById(userId: string, id: string) {
+  async deleteQuestionById(userId: string, id: string) {
     if (!isUUID(id)) {
       return true;
     }
-    const question = await uow.interviewQuestions.findById(id);
+    const question = await this.uow.interviewQuestions.findById(id);
     if (question && question.userId === userId) {
-      await uow.interviewQuestions.delete(id);
+      await this.uow.interviewQuestions.delete(id);
     }
     return true;
   }
 
-  static async getProgress(userId: string) {
-    return await uow.userProgress.findByUserId(userId);
+  async getProgress(userId: string) {
+    return await this.uow.userProgress.findByUserId(userId);
   }
 
-  // NOTE: toggleProgress uses a compound filter (userId + itemId) that is
-  // domain-specific. Keeping findAll/updateMany with drizzle filters for now.
-  static async toggleProgress(
+  async toggleProgress(
     userId: string,
     itemId: string,
     areaId: string,
     completed: boolean,
   ) {
-    const existing = await uow.userProgress.findAll(
-      and(eq(userProgress.userId, userId), eq(userProgress.itemId, itemId)),
-    );
+    const existing = await this.uow.userProgress.findByUserAndItem(userId, itemId);
 
     if (existing.length > 0) {
-      const [r] = await uow.userProgress.updateMany(
-        and(eq(userProgress.userId, userId), eq(userProgress.itemId, itemId)),
-        { completed }
+      const [r] = await this.uow.userProgress.updateCompletedByUserAndItem(
+        userId,
+        itemId,
+        completed,
       );
       return r;
     } else {
-      const r = await uow.userProgress.create({
+      const r = await this.uow.userProgress.create({
         userId,
         itemId,
         areaId,
@@ -95,4 +83,3 @@ export class InterviewService {
     }
   }
 }
-

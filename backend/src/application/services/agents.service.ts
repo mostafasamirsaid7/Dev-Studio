@@ -1,24 +1,26 @@
 import { stripDates, isUUID } from "../../domain/utils.js";
-import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
+import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
 
 export class AgentsService {
-  static async getAll(userId: string) {
-    return await uow.agents.findByUserId(userId);
+  constructor(private uow: IUnitOfWork) {}
+
+  async getAll(userId: string) {
+    return await this.uow.agents.findByUserId(userId);
   }
 
-  static async create(userId: string, rawData: any) {
+  async create(userId: string, rawData: any) {
     const { id, ...raw } = rawData;
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.agents.findByUserAndId(userId, safeId)
+      ? await this.uow.agents.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {
-      const r = await uow.agents.update(safeId!, data);
+      const r = await this.uow.agents.update(safeId!, data);
       return r;
     } else {
-      const r = await uow.agents.create({
+      const r = await this.uow.agents.create({
         ...data,
         userId,
         ...(safeId ? { id: safeId } : {}),
@@ -27,7 +29,7 @@ export class AgentsService {
     }
   }
 
-  static async createBulk(userId: string, items: any[]) {
+  async createBulk(userId: string, items: any[]) {
     if (!items.length) {
       return [];
     }
@@ -37,17 +39,18 @@ export class AgentsService {
       return { ...data, userId, ...(safeId ? { id: safeId } : {}) } as any;
     });
 
-    return await uow.agents.createMany(values);
+    return await this.uow.agents.createMany(values);
   }
 
-  static async deleteById(userId: string, id: string) {
+  async deleteById(userId: string, id: string) {
     if (!isUUID(id)) {
       return true;
     }
-    const agent = await uow.agents.findById(id);
+    const agent = await this.uow.agents.findById(id);
     if (agent && agent.userId === userId) {
-      await uow.agents.delete(id);
+      await this.uow.agents.delete(id);
     }
     return true;
   }
 }
+

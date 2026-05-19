@@ -1,26 +1,29 @@
-import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
+import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
 
 export class ProfileService {
-  static async getByUserId(userId: string) {
-    const rows = await uow.userProfiles.findByUserId(userId);
+  constructor(private uow: IUnitOfWork) {}
+
+  async getByUserId(userId: string) {
+    const rows = await this.uow.userProfiles.findByUserId(userId);
     return rows[0] ?? null;
   }
 
-  static async upsert(
+  async upsert(
     userId: string,
     data: { displayName?: string; avatarUrl?: string; location?: string },
   ) {
-    const existing = await uow.userProfiles.findByUserId(userId);
+    const existing = await this.uow.userProfiles.findByUserId(userId);
 
     if (existing.length > 0) {
       // Find the profile ID to perform an ID-based update
       const profileId = existing[0].id;
-      const r = await uow.userProfiles.update(profileId, data);
+      const r = await this.uow.userProfiles.update(profileId, data);
       return r;
     } else {
-      const r = await uow.userProfiles.create({ userId, ...data });
+      const r = await this.uow.userProfiles.create({ userId, ...data });
       return r;
     }
   }
 }
+
 

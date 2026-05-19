@@ -1,24 +1,26 @@
 import { stripDates, isUUID } from "../../domain/utils.js";
-import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
+import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
 
 export class SocialService {
-  static async getAll(userId: string) {
-    return await uow.socialDrafts.findByUserId(userId);
+  constructor(private uow: IUnitOfWork) {}
+
+  async getAll(userId: string) {
+    return await this.uow.socialDrafts.findByUserId(userId);
   }
 
-  static async create(userId: string, rawData: any) {
+  async create(userId: string, rawData: any) {
     const { id, ...raw } = rawData;
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.socialDrafts.findByUserAndId(userId, safeId)
+      ? await this.uow.socialDrafts.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {
-      const r = await uow.socialDrafts.update(safeId!, data);
+      const r = await this.uow.socialDrafts.update(safeId!, data);
       return r;
     } else {
-      const r = await uow.socialDrafts.create({
+      const r = await this.uow.socialDrafts.create({
         ...data,
         userId,
         ...(safeId ? { id: safeId } : {}),
@@ -27,7 +29,7 @@ export class SocialService {
     }
   }
 
-  static async createBulk(userId: string, items: any[]) {
+  async createBulk(userId: string, items: any[]) {
     if (!items.length) {
       return [];
     }
@@ -37,17 +39,18 @@ export class SocialService {
       return { ...data, userId, ...(safeId ? { id: safeId } : {}) } as any;
     });
 
-    return await uow.socialDrafts.createMany(values);
+    return await this.uow.socialDrafts.createMany(values);
   }
 
-  static async deleteById(userId: string, id: string) {
+  async deleteById(userId: string, id: string) {
     if (!isUUID(id)) {
       return true;
     }
-    const draft = await uow.socialDrafts.findById(id);
+    const draft = await this.uow.socialDrafts.findById(id);
     if (draft && draft.userId === userId) {
-      await uow.socialDrafts.delete(id);
+      await this.uow.socialDrafts.delete(id);
     }
     return true;
   }
 }
+

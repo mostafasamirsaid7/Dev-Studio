@@ -6,7 +6,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { db } from "../../infrastructure/database/index.js";
 import { authUsers } from "../../domain/schema.js";
 import { eq, or } from "drizzle-orm";
-import { AuthService } from "../../application/services/auth.service.js";
+import { authService } from "../../infrastructure/di/container.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 const JWT_SECRET =
@@ -55,13 +55,25 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, displayName } = req.body;
 
-    const existing = await AuthService.findUserByEmail(email);
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ error: "Email and password are required" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters" });
+    }
+
+    const existing = await authService.findUserByEmail(email);
     if (existing)
       return res
         .status(409)
         .json({ error: "An account with this email already exists" });
 
-    const user = await AuthService.registerUser(email, password, displayName);
+    const user = await authService.registerUser(email, password, displayName);
     console.log(
       `[auth] Dev Verification Code for ${user.email}: ${user.verificationToken}`,
     );
@@ -82,16 +94,22 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const user = await AuthService.findUserByEmail(email);
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ error: "Email and password are required" });
+    }
+
+    const user = await authService.findUserByEmail(email);
     if (!user || !user.passwordHash)
       return res.status(401).json({ error: "Invalid email or password" });
 
-    const valid = await AuthService.verifyPassword(password, user.passwordHash);
+    const valid = await authService.verifyPassword(password, user.passwordHash);
     if (!valid)
       return res.status(401).json({ error: "Invalid email or password" });
 
     if (!user.isVerified) {
-      const updated = await AuthService.createNewVerificationToken(user.id);
+      const updated = await authService.createNewVerificationToken(user.id);
       console.log(
         `[auth] New Dev Verification Code for ${user.email}: ${updated.verificationToken}`,
       );
@@ -114,7 +132,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
   try {
     const { email, code } = req.body;
 
-    const user = await AuthService.findUserByEmail(email);
+    const user = await authService.findUserByEmail(email);
     if (!user) return res.status(404).json({ error: "User not found" });
     if (user.isVerified) return sendToken(res, user.id, safeUser(user));
 
@@ -131,7 +149,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
           error: "Verification code has expired. Please request a new one.",
         });
 
-    const updated = await AuthService.verifyUserEmail(user.id);
+    const updated = await authService.verifyUserEmail(user.id);
     sendToken(res, updated.id, safeUser(updated));
   } catch (err) {
     console.error("[auth] verify-email error:", err);
@@ -143,12 +161,12 @@ export const resendVerification = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
-    const user = await AuthService.findUserByEmail(email);
+    const user = await authService.findUserByEmail(email);
     if (!user) return res.status(404).json({ error: "User not found" });
     if (user.isVerified)
       return res.json({ message: "Email is already verified" });
 
-    const updated = await AuthService.createNewVerificationToken(user.id);
+    const updated = await authService.createNewVerificationToken(user.id);
     console.log(
       `[auth] Resent Dev Verification Code for ${email}: ${updated.verificationToken}`,
     );
@@ -173,7 +191,7 @@ export const getUser = async (req: Request, res: Response) => {
   if (!token) return res.status(401).json({ error: "Not authenticated" });
   try {
     const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
-    const user = await AuthService.findUserById(payload.sub);
+    const user = await authService.findUserById(payload.sub);
     if (!user) return res.status(401).json({ error: "User not found" });
     res.json(safeUser(user));
   } catch {

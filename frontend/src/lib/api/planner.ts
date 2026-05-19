@@ -29,3 +29,52 @@ export async function getAISuggestions(
     body: JSON.stringify({ date, tasks }),
   });
 }
+
+export interface PlannerPresetItem {
+  title: string;
+  time: string;
+}
+
+export interface ActivitySuggestion {
+  iconName: string;
+  label: string;
+  bestTime: string;
+  reason: string;
+}
+
+export interface PrayerSuggestionTemplate {
+  iconName: string;
+  label: string;
+  offsetStart?: number;
+  offsetEnd?: number;
+  anchorStart?: string;
+  anchorEnd?: string;
+  anchor?: string;
+  fallbackTime: string;
+  fallbackReason: string;
+  reasonTemplate: string;
+}
+
+export interface PlannerPresetsResponse {
+  presets: {
+    food: PlannerPresetItem[];
+    sports: PlannerPresetItem[];
+    care: PlannerPresetItem[];
+    working: PlannerPresetItem[];
+    learning: PlannerPresetItem[];
+  };
+  suggestions: {
+    working: ActivitySuggestion[];
+    learning: ActivitySuggestion[];
+    prayerTemplates: {
+      food: PrayerSuggestionTemplate[];
+      sports: PrayerSuggestionTemplate[];
+      care: PrayerSuggestionTemplate[];
+    };
+  };
+}
+
+export async function getPlannerPresets(): Promise<PlannerPresetsResponse> {
+  return apiFetch<PlannerPresetsResponse>("/api/planner/presets");
+}
+

@@ -1,24 +1,26 @@
 import { stripDates, isUUID } from "../../domain/utils.js";
-import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
+import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
 
 export class ComponentsService {
-  static async getAll(userId: string) {
-    return await uow.components.findByUserId(userId);
+  constructor(private uow: IUnitOfWork) {}
+
+  async getAll(userId: string) {
+    return await this.uow.components.findByUserId(userId);
   }
 
-  static async create(userId: string, rawData: any) {
+  async create(userId: string, rawData: any) {
     const { id, ...raw } = rawData;
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.components.findByUserAndId(userId, safeId)
+      ? await this.uow.components.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {
-      const r = await uow.components.update(safeId!, data);
+      const r = await this.uow.components.update(safeId!, data);
       return r;
     } else {
-      const r = await uow.components.create({
+      const r = await this.uow.components.create({
         ...data,
         userId,
         ...(safeId ? { id: safeId } : {}),
@@ -27,7 +29,7 @@ export class ComponentsService {
     }
   }
 
-  static async createBulk(userId: string, items: any[]) {
+  async createBulk(userId: string, items: any[]) {
     if (!items.length) {
       return [];
     }
@@ -37,17 +39,18 @@ export class ComponentsService {
       return { ...data, userId, ...(safeId ? { id: safeId } : {}) } as any;
     });
 
-    return await uow.components.createMany(values);
+    return await this.uow.components.createMany(values);
   }
 
-  static async deleteById(userId: string, id: string) {
+  async deleteById(userId: string, id: string) {
     if (!isUUID(id)) {
       return true;
     }
-    const comp = await uow.components.findById(id);
+    const comp = await this.uow.components.findById(id);
     if (comp && comp.userId === userId) {
-      await uow.components.delete(id);
+      await this.uow.components.delete(id);
     }
     return true;
   }
 }
+

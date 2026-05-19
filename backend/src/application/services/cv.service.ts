@@ -1,16 +1,21 @@
 
-import { getOpenAI } from "../../infrastructure/lib/openai.js";
 import { stripDates, isUUID } from "../../domain/utils.js";
-import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
+import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
+import { ILLMService } from "../../domain/services/llm.interface.js";
 import { CVMapper } from "../../domain/mappers/cv.mapper.js";
 
 export class CVService {
-  static async getAll(userId: string) {
-    const rows = await uow.cvProfiles.findByUserId(userId);
+  constructor(
+    private uow: IUnitOfWork,
+    private llmService: ILLMService,
+  ) {}
+
+  async getAll(userId: string) {
+    const rows = await this.uow.cvProfiles.findByUserId(userId);
     return rows.map(CVMapper.toDomain);
   }
 
-  static async create(userId: string, rawData: any) {
+  async create(userId: string, rawData: any) {
     const {
       id,
       personalInfo,
@@ -35,14 +40,14 @@ export class CVService {
 
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.cvProfiles.findByUserAndId(userId, safeId)
+      ? await this.uow.cvProfiles.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {
-      const r = await uow.cvProfiles.update(safeId!, data);
+      const r = await this.uow.cvProfiles.update(safeId!, data);
       return CVMapper.toDomain(r);
     } else {
-      const r = await uow.cvProfiles.create({
+      const r = await this.uow.cvProfiles.create({
         ...data,
         userId,
         ...(safeId ? { id: safeId } : {}),
@@ -51,16 +56,16 @@ export class CVService {
     }
   }
 
-  static async deleteById(userId: string, id: string) {
+  async deleteById(userId: string, id: string) {
     if (!isUUID(id)) return true;
-    const cv = await uow.cvProfiles.findById(id);
+    const cv = await this.uow.cvProfiles.findById(id);
     if (cv && cv.userId === userId) {
-      await uow.cvProfiles.delete(id);
+      await this.uow.cvProfiles.delete(id);
     }
     return true;
   }
 
-  static async atsCheck(cvProfile: any, jobDescription: string) {
+  async atsCheck(cvProfile: any, jobDescription: string) {
     if (!cvProfile || !jobDescription) {
       throw new Error("cvProfile and jobDescription are required");
     }
@@ -120,21 +125,10 @@ Be precise, actionable, and focus on what matters for ATS systems (keyword densi
 
     const userPrompt = `JOB DESCRIPTION:\n${jobDescription}\n\n---\n\nCV:\n${cvText}`;
 
-    const response = await getOpenAI().chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.3,
-      response_format: { type: "json_object" },
-    });
-
-    const content = response.choices[0]?.message?.content ?? "{}";
-    return JSON.parse(content);
+    return await this.llmService.createJsonCompletion<any>(userPrompt, systemPrompt, { temperature: 0.3 });
   }
 
-  static parsePdf(fileBase64: string) {
+  parsePdf(fileBase64: string) {
     if (!fileBase64) throw new Error("fileBase64 required");
 
     const buffer = Buffer.from(fileBase64, "base64");
@@ -170,3 +164,4 @@ Be precise, actionable, and focus on what matters for ATS systems (keyword densi
     return lines.join("\n");
   }
 }
+

@@ -9,7 +9,6 @@ import {
   Plus,
   Check,
   ChevronDown,
-  Flame,
   Bath,
   Timer,
   AlertCircle,
@@ -33,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { usePrayerTimes, type PrayerTime } from "@/hooks/use-prayer-times";
+import { usePlannerPresets } from "@/hooks/use-planner-presets";
 import {
   toDateStr,
   to24hMin,
@@ -42,84 +42,49 @@ import {
 } from "@/lib/planner-utils";
 import {
   INNER_TABS,
-  WORKING_SUGGESTIONS,
-  LEARNING_SUGGESTIONS,
-  PRESET_FOOD,
-  PRESET_SPORTS,
-  PRESET_CARE,
-  PRESET_WORKING,
-  PRESET_LEARNING,
   ACTIVITIES_STORAGE_KEY,
   PRAYER_TRACKER_KEY,
 } from "@/data/planner/activities";
 import type { ActivityItem, ActivitySuggestion, InnerTab } from "@/data/planner/activities";
 
+const ICON_MAP: Record<string, LucideIcon> = {
+  Coffee,
+  Salad,
+  UtensilsCrossed,
+  Dumbbell,
+  Footprints,
+  HeartPulse,
+  Sparkles,
+  Droplets,
+  BedDouble,
+  Briefcase,
+  Timer,
+  MessageSquare,
+  BookOpen,
+  Monitor,
+  FileCode2,
+};
+
 /* ── Prayer-aware suggestions ───────────────────── */
-function getPrayerSuggestions(prayers: PrayerTime[]): {
+function getPrayerSuggestions(
+  prayers: PrayerTime[],
+  templates: any
+): {
   food: ActivitySuggestion[];
   sports: ActivitySuggestion[];
   care: ActivitySuggestion[];
 } {
-  if (prayers.length === 0) {
-    return {
-      food: [
-        {
-          Icon: Coffee,
-          label: "Breakfast",
-          bestTime: "06:30 – 08:00",
-          reason: "After Fajr prayer",
-        },
-        { Icon: Salad, label: "Lunch", bestTime: "12:30 – 13:30", reason: "After Dhuhr prayer" },
-        {
-          Icon: UtensilsCrossed,
-          label: "Dinner",
-          bestTime: "19:30 – 20:30",
-          reason: "After Maghrib prayer",
-        },
-      ],
-      sports: [
-        {
-          Icon: Dumbbell,
-          label: "Morning workout",
-          bestTime: "08:00 – 10:00",
-          reason: "After breakfast, high energy",
-        },
-        {
-          Icon: Footprints,
-          label: "Afternoon walk",
-          bestTime: "15:30 – 17:00",
-          reason: "Before Maghrib, cooler air",
-        },
-        {
-          Icon: HeartPulse,
-          label: "Yoga / stretch",
-          bestTime: "05:30 – 06:00",
-          reason: "Before Fajr, peaceful time",
-        },
-      ],
-      care: [
-        {
-          Icon: Sparkles,
-          label: "Morning grooming",
-          bestTime: "06:00 – 06:30",
-          reason: "Before Fajr, fresh start",
-        },
-        {
-          Icon: Droplets,
-          label: "Evening shower",
-          bestTime: "20:00 – 21:00",
-          reason: "After Maghrib, wind down",
-        },
-        {
-          Icon: BedDouble,
-          label: "Sleep prep",
-          bestTime: "22:00 – 23:00",
-          reason: "After Isha, restful night",
-        },
-      ],
-    };
+  const result = {
+    food: [] as ActivitySuggestion[],
+    sports: [] as ActivitySuggestion[],
+    care: [] as ActivitySuggestion[],
+  };
+
+  if (!templates || Object.keys(templates).length === 0) {
+    return result;
   }
 
+  const categories = ["food", "sports", "care"] as const;
   const fajrMin = to24hMin(prayers.find((p) => p.name === "Fajr")?.time ?? "05:00");
   const dhuhrMin = to24hMin(prayers.find((p) => p.name === "Dhuhr")?.time ?? "12:00");
   const asrMin = to24hMin(prayers.find((p) => p.name === "Asr")?.time ?? "15:30");
@@ -127,68 +92,55 @@ function getPrayerSuggestions(prayers: PrayerTime[]): {
   const ishaMin = to24hMin(prayers.find((p) => p.name === "Isha")?.time ?? "20:00");
   const f = formatMinutesLabel;
 
-  return {
-    food: [
-      {
-        Icon: Coffee,
-        label: "Breakfast",
-        bestTime: `${f(fajrMin + 20)} – ${f(fajrMin + 60)}`,
-        reason: "20–60 min after Fajr",
-      },
-      {
-        Icon: Salad,
-        label: "Lunch",
-        bestTime: `${f(dhuhrMin + 15)} – ${f(dhuhrMin + 75)}`,
-        reason: "After Dhuhr prayer",
-      },
-      {
-        Icon: UtensilsCrossed,
-        label: "Dinner",
-        bestTime: `${f(maghribMin + 15)} – ${f(maghribMin + 75)}`,
-        reason: "After Maghrib prayer",
-      },
-    ],
-    sports: [
-      {
-        Icon: Dumbbell,
-        label: "Strength training",
-        bestTime: `${f(fajrMin + 70)} – ${f(dhuhrMin - 60)}`,
-        reason: "Post-breakfast energy peak",
-      },
-      {
-        Icon: Footprints,
-        label: "Walk / cardio",
-        bestTime: `${f(asrMin + 20)} – ${f(maghribMin - 20)}`,
-        reason: "Asr → Maghrib window, cool air",
-      },
-      {
-        Icon: HeartPulse,
-        label: "Yoga / stretch",
-        bestTime: `${f(fajrMin + 5)} – ${f(fajrMin + 35)}`,
-        reason: "Right after Fajr, peaceful",
-      },
-    ],
-    care: [
-      {
-        Icon: Sparkles,
-        label: "Morning grooming",
-        bestTime: `${f(fajrMin - 20)} – ${f(fajrMin)}`,
-        reason: "Before Fajr, fresh start",
-      },
-      {
-        Icon: Droplets,
-        label: "Shower / bath",
-        bestTime: `${f(maghribMin + 20)} – ${f(maghribMin + 50)}`,
-        reason: "After Maghrib, relax",
-      },
-      {
-        Icon: BedDouble,
-        label: "Sleep routine",
-        bestTime: `${f(ishaMin + 60)} – ${f(ishaMin + 90)}`,
-        reason: "90 min after Isha, quality sleep",
-      },
-    ],
+  const getMinVal = (anchor: string) => {
+    switch (anchor) {
+      case "Fajr": return fajrMin;
+      case "Dhuhr": return dhuhrMin;
+      case "Asr": return asrMin;
+      case "Maghrib": return maghribMin;
+      case "Isha": return ishaMin;
+      default: return 0;
+    }
   };
+
+  for (const cat of categories) {
+    const list = templates[cat] || [];
+    result[cat] = list.map((item: any) => {
+      const Icon = ICON_MAP[item.iconName] || Activity;
+      
+      if (prayers.length === 0) {
+        return {
+          Icon,
+          label: item.label,
+          bestTime: item.fallbackTime,
+          reason: item.fallbackReason,
+        };
+      }
+
+      let bestTime = "";
+      if (item.anchorStart && item.anchorEnd) {
+        const start = getMinVal(item.anchorStart) + (item.offsetStart || 0);
+        const end = getMinVal(item.anchorEnd) + (item.offsetEnd || 0);
+        bestTime = `${f(start)} – ${f(end)}`;
+      } else if (item.anchor) {
+        const base = getMinVal(item.anchor);
+        const start = base + (item.offsetStart || 0);
+        const end = base + (item.offsetEnd || 0);
+        bestTime = `${f(start)} – ${f(end)}`;
+      } else {
+        bestTime = item.fallbackTime;
+      }
+
+      return {
+        Icon,
+        label: item.label,
+        bestTime,
+        reason: item.reasonTemplate,
+      };
+    });
+  }
+
+  return result;
 }
 
 /* ── Storage helpers ─────────────────────────────── */
@@ -720,7 +672,21 @@ function PrayerPanel() {
 export function ActivitiesTab() {
   const [innerTab, setInnerTab] = useState<InnerTab>("prayer");
   const { prayers } = usePrayerTimes();
-  const suggestions = getPrayerSuggestions(prayers);
+  const { data, loading } = usePlannerPresets();
+
+  const suggestions = getPrayerSuggestions(prayers, data?.suggestions.prayerTemplates);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <RefreshCw className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const sportsPresets = data?.presets.sports || [];
+  const carePresets = data?.presets.care || [];
+  const foodPresets = data?.presets.food || [];
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -762,7 +728,7 @@ export function ActivitiesTab() {
             bgColor="bg-blue-500/5"
             borderColor="border-blue-500/20"
             suggestions={suggestions.sports}
-            presets={PRESET_SPORTS}
+            presets={sportsPresets}
           />
         )}
 
@@ -775,7 +741,7 @@ export function ActivitiesTab() {
             bgColor="bg-rose-500/5"
             borderColor="border-rose-500/20"
             suggestions={suggestions.care}
-            presets={PRESET_CARE}
+            presets={carePresets}
           />
         )}
 
@@ -788,7 +754,7 @@ export function ActivitiesTab() {
             bgColor="bg-amber-500/5"
             borderColor="border-amber-500/20"
             suggestions={suggestions.food}
-            presets={PRESET_FOOD}
+            presets={foodPresets}
           />
         )}
       </div>
@@ -798,6 +764,24 @@ export function ActivitiesTab() {
 
 /* ── STANDALONE EXPORTS for main tab nav ─────────── */
 export function WorkingTab() {
+  const { data, loading } = usePlannerPresets();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <RefreshCw className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const presets = data?.presets.working || [];
+  const suggestions: ActivitySuggestion[] = (data?.suggestions.working || []).map((s: any) => ({
+    Icon: ICON_MAP[s.iconName] || Briefcase,
+    label: s.label,
+    bestTime: s.bestTime,
+    reason: s.reason,
+  }));
+
   return (
     <div className="flex-1 overflow-y-auto scrollbar-thin">
       <ActivityPanel
@@ -807,14 +791,32 @@ export function WorkingTab() {
         color="text-violet-600"
         bgColor="bg-violet-500/5"
         borderColor="border-violet-500/20"
-        suggestions={WORKING_SUGGESTIONS}
-        presets={PRESET_WORKING}
+        suggestions={suggestions}
+        presets={presets}
       />
     </div>
   );
 }
 
 export function LearningTab() {
+  const { data, loading } = usePlannerPresets();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <RefreshCw className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const presets = data?.presets.learning || [];
+  const suggestions: ActivitySuggestion[] = (data?.suggestions.learning || []).map((s: any) => ({
+    Icon: ICON_MAP[s.iconName] || BookOpen,
+    label: s.label,
+    bestTime: s.bestTime,
+    reason: s.reason,
+  }));
+
   return (
     <div className="flex-1 overflow-y-auto scrollbar-thin">
       <ActivityPanel
@@ -824,8 +826,8 @@ export function LearningTab() {
         color="text-emerald-600"
         bgColor="bg-emerald-500/5"
         borderColor="border-emerald-500/20"
-        suggestions={LEARNING_SUGGESTIONS}
-        presets={PRESET_LEARNING}
+        suggestions={suggestions}
+        presets={presets}
       />
     </div>
   );

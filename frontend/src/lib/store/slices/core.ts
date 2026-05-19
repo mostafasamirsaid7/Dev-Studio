@@ -133,6 +133,7 @@ export const createCoreSlice: StateCreator<
           category: x.category || "frontend",
           tags: x.tags || [],
           favorite: x.favorite ?? false,
+          isGlobal: x.isGlobal ?? false,
           createdAt: x.createdAt ? new Date(x.createdAt).getTime() : Date.now(),
         })),
         cvProfiles: cvs,

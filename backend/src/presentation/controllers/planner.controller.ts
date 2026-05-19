@@ -2,14 +2,14 @@ import { Router, Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
 import { validateBody, validateQuery, validateParams } from "../middleware/validation.js";
 import { PlannerTaskDto, PlannerSuggestDto, PlannerSeedDto, PlannerQueryDto } from "../dtos/planner.dto.js";
-import { PlannerService } from "../../application/services/planner.service.js";
+import { plannerService } from "../../infrastructure/di/container.js";
 
 export const getAll = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   const { from, to } = req.query as { from?: string; to?: string };
   try {
-    const data = await PlannerService.getAll(uid, from, to);
+    const data = await plannerService.getAll(uid, from, to);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch planner tasks" });
@@ -20,7 +20,7 @@ export const create = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const data = await PlannerService.create(uid, req.body);
+    const data = await plannerService.create(uid, req.body);
     res.json(data);
   } catch (error) {
     const msg =
@@ -36,7 +36,7 @@ export const deleteById = async (req: Request, res: Response) => {
   if (!uid) return;
   try {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    await PlannerService.deleteById(uid, id);
+    await plannerService.deleteById(uid, id);
     res.json({ ok: true });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete task" });
@@ -48,7 +48,7 @@ export const postSuggest = async (req: Request, res: Response) => {
   if (!uid) return;
   const { date, tasks } = req.body;
   try {
-    const data = await PlannerService.suggest(date, tasks);
+    const data = await plannerService.suggest(date, tasks);
     res.json(data);
   } catch (error) {
     const msg = error instanceof Error ? error.message : "AI failed";
@@ -61,10 +61,19 @@ export const postSeed = async (req: Request, res: Response) => {
   if (!uid) return;
   const { month, clear } = req.body as { month?: string; clear?: boolean };
   try {
-    const data = await PlannerService.seed(uid, month, clear);
+    const data = await plannerService.seed(uid, month, clear);
     res.json({ ok: true, count: data.count });
   } catch (error) {
     res.status(500).json({ error: "Failed to seed planner tasks" });
+  }
+};
+
+export const getPresets = async (req: Request, res: Response) => {
+  try {
+    const data = plannerService.getPresets();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch planner presets" });
   }
 };
 
@@ -72,8 +81,10 @@ import { IdParamDto } from "../dtos/common.dto.js";
 
 const router = Router();
 router.get("/", validateQuery(PlannerQueryDto), getAll);
+router.get("/presets", getPresets);
 router.post("/", validateBody(PlannerTaskDto), create);
 router.delete("/:id", validateParams(IdParamDto), deleteById);
 router.post("/suggest", validateBody(PlannerSuggestDto), postSuggest);
 router.post("/seed", validateBody(PlannerSeedDto), postSeed);
 export default router;
+

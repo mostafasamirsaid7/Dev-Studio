@@ -1,24 +1,26 @@
 import { stripDates, isUUID } from "../../domain/utils.js";
-import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
+import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
 
 export class ConnectorsService {
-  static async getAll(userId: string) {
-    return await uow.connectors.findByUserId(userId);
+  constructor(private uow: IUnitOfWork) {}
+
+  async getAll(userId: string) {
+    return await this.uow.connectors.findByUserId(userId);
   }
 
-  static async create(userId: string, rawData: any) {
+  async create(userId: string, rawData: any) {
     const { id, ...raw } = rawData;
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.connectors.findByUserAndId(userId, safeId)
+      ? await this.uow.connectors.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {
-      const r = await uow.connectors.update(safeId!, data);
+      const r = await this.uow.connectors.update(safeId!, data);
       return r;
     } else {
-      const r = await uow.connectors.create({
+      const r = await this.uow.connectors.create({
         ...data,
         userId,
         ...(safeId ? { id: safeId } : {}),
@@ -27,7 +29,7 @@ export class ConnectorsService {
     }
   }
 
-  static async createBulk(userId: string, items: any[]) {
+  async createBulk(userId: string, items: any[]) {
     if (!items.length) {
       return [];
     }
@@ -37,17 +39,18 @@ export class ConnectorsService {
       return { ...data, userId, ...(safeId ? { id: safeId } : {}) } as any;
     });
 
-    return await uow.connectors.createMany(values);
+    return await this.uow.connectors.createMany(values);
   }
 
-  static async deleteById(userId: string, id: string) {
+  async deleteById(userId: string, id: string) {
     if (!isUUID(id)) {
       return true;
     }
-    const conn = await uow.connectors.findById(id);
+    const conn = await this.uow.connectors.findById(id);
     if (conn && conn.userId === userId) {
-      await uow.connectors.delete(id);
+      await this.uow.connectors.delete(id);
     }
     return true;
   }
 }
+

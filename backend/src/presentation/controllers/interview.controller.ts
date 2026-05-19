@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
 import { validateBody, validateParams } from "../middleware/validation.js";
-import { InterviewService } from "../../application/services/interview.service.js";
+import { interviewService } from "../../infrastructure/di/container.js";
 import { InterviewQuestionDto, ProgressToggleDto } from "../dtos/learning.dto.js";
 import { z } from "zod";
 import { IdParamDto } from "../dtos/common.dto.js";
@@ -11,7 +11,7 @@ export const getQuestions = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const data = await InterviewService.getQuestions(uid);
+    const data = await interviewService.getQuestions(uid);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch interview questions" });
@@ -22,7 +22,7 @@ export const postQuestions = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const result = await InterviewService.createQuestion(uid, req.body);
+    const result = await interviewService.createQuestion(uid, req.body);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to create interview question" });
@@ -34,7 +34,7 @@ export const postQuestionsBulk = async (req: Request, res: Response) => {
   if (!uid) return;
   try {
     const items = Array.isArray(req.body) ? req.body : [];
-    const result = await InterviewService.createQuestionsBulk(uid, items);
+    const result = await interviewService.createQuestionsBulk(uid, items);
     res.json(result);
   } catch (error) {
     res
@@ -48,7 +48,7 @@ export const deleteQuestionsById = async (req: Request, res: Response) => {
   if (!uid) return;
   try {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    await InterviewService.deleteQuestionById(uid, id);
+    await interviewService.deleteQuestionById(uid, id);
     res.json({ ok: true });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete interview question" });
@@ -59,7 +59,7 @@ export const getProgress = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
   if (!uid) return;
   try {
-    const data = await InterviewService.getProgress(uid);
+    const data = await interviewService.getProgress(uid);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch progress" });
@@ -71,7 +71,7 @@ export const postProgressToggle = async (req: Request, res: Response) => {
   if (!uid) return;
   const { itemId, areaId, completed } = req.body;
   try {
-    const result = await InterviewService.toggleProgress(
+    const result = await interviewService.toggleProgress(
       uid,
       itemId,
       areaId,
@@ -91,3 +91,4 @@ router.delete("/questions/:id", validateParams(IdParamDto), deleteQuestionsById)
 router.get("/progress", getProgress);
 router.post("/progress/toggle", validateBody(ProgressToggleDto), postProgressToggle);
 export default router;
+

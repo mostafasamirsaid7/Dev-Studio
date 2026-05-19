@@ -1,24 +1,26 @@
 import { stripDates, isUUID } from "../../domain/utils.js";
-import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
+import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
 
 export class TemplatesService {
-  static async getAll(userId: string) {
-    return await uow.templates.findByUserId(userId);
+  constructor(private uow: IUnitOfWork) {}
+
+  async getAll(userId: string) {
+    return await this.uow.templates.findByUserId(userId);
   }
 
-  static async create(userId: string, rawData: any) {
+  async create(userId: string, rawData: any) {
     const { id, ...raw } = rawData;
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.templates.findByUserAndId(userId, safeId)
+      ? await this.uow.templates.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {
-      const r = await uow.templates.update(safeId!, data);
+      const r = await this.uow.templates.update(safeId!, data);
       return r;
     } else {
-      const r = await uow.templates.create({
+      const r = await this.uow.templates.create({
         ...data,
         userId,
         ...(safeId ? { id: safeId } : {}),
@@ -27,7 +29,7 @@ export class TemplatesService {
     }
   }
 
-  static async createBulk(userId: string, items: any[]) {
+  async createBulk(userId: string, items: any[]) {
     if (!items.length) {
       return [];
     }
@@ -37,17 +39,18 @@ export class TemplatesService {
       return { ...data, userId, ...(safeId ? { id: safeId } : {}) } as any;
     });
 
-    return await uow.templates.createMany(values);
+    return await this.uow.templates.createMany(values);
   }
 
-  static async deleteById(userId: string, id: string) {
+  async deleteById(userId: string, id: string) {
     if (!isUUID(id)) {
       return true;
     }
-    const templ = await uow.templates.findById(id);
+    const templ = await this.uow.templates.findById(id);
     if (templ && templ.userId === userId) {
-      await uow.templates.delete(id);
+      await this.uow.templates.delete(id);
     }
     return true;
   }
 }
+
