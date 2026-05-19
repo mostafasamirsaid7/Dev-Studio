@@ -37,6 +37,28 @@ export const QUESTION_AREAS = [
 ] as const;
 export type QuestionArea = (typeof QUESTION_AREAS)[number];
 
+// --- Tech Skill Area IDs (matches frontend TechAreaId) ---
+
+export const TECH_AREA_IDS = [
+  "frontend",
+  "backend",
+  "devops",
+  "testing",
+  "database",
+  "design-patterns",
+  "architecture",
+  "system-design",
+  "microservices",
+  "security",
+  "performance",
+] as const;
+export type TechAreaId = (typeof TECH_AREA_IDS)[number];
+
+// --- Skill Item Types ---
+
+export const SKILL_ITEM_PRIORITIES = ["low", "medium", "high"] as const;
+export type SkillItemPriority = (typeof SKILL_ITEM_PRIORITIES)[number];
+
 // --- Career & Jobs Enums ---
 
 export const JOB_STATUSES = [

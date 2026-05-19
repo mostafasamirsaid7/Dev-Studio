@@ -10,7 +10,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 
-import { QUESTION_DIFFICULTIES, QUESTION_AREAS } from "../enums.js";
+import { QUESTION_DIFFICULTIES, QUESTION_AREAS, SKILL_ITEM_PRIORITIES } from "../enums.js";
 
 export const questionDifficultyEnum = pgEnum(
   "question_difficulty",
@@ -54,5 +54,42 @@ export const userProgress = pgTable(
   (t) => [
     primaryKey({ columns: [t.userId, t.itemId] }),
     index("user_progress_user_id_idx").on(t.userId),
+  ],
+);
+
+export const skillItemPriorityEnum = pgEnum("skill_item_priority", SKILL_ITEM_PRIORITIES);
+
+export const skillTasks = pgTable(
+  "skill_tasks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    areaId: text("area_id").notNull(),
+    title: text("title").notNull(),
+    notes: text("notes").default(""),
+    done: boolean("done").default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("skill_tasks_user_area_idx").on(t.userId, t.areaId),
+  ],
+);
+
+export const skillProjects = pgTable(
+  "skill_projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    areaId: text("area_id").notNull(),
+    title: text("title").notNull(),
+    desc: text("desc").default(""),
+    url: text("url").default(""),
+    tags: text("tags").array().default([]),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("skill_projects_user_area_idx").on(t.userId, t.areaId),
   ],
 );

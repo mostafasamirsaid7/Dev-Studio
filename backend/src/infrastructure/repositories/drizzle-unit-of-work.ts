@@ -17,6 +17,8 @@ import {
   authUsers,
   userProfiles,
   userProgress,
+  skillTasks,
+  skillProjects,
 } from "../../domain/schema.js";
 import { DrizzleBaseRepository } from "./drizzle-base.repository.js";
 import { DrizzlePlannerTasksRepository } from "./drizzle-planner-tasks.repository.js";
@@ -46,6 +48,8 @@ export class DrizzleUnitOfWork implements IUnitOfWork {
   public authUsers: IRepository<any, any>;
   public userProfiles: IRepository<any, any>;
   public userProgress: IUserProgressRepository<any, any>;
+  public skillTasks: IRepository<any, any>;
+  public skillProjects: IRepository<any, any>;
 
   constructor(private client: any = db) {
     this.agents = new DrizzleBaseRepository(agents, this.client);
@@ -65,6 +69,8 @@ export class DrizzleUnitOfWork implements IUnitOfWork {
     this.authUsers = new DrizzleBaseRepository(authUsers, this.client);
     this.userProfiles = new DrizzleBaseRepository(userProfiles, this.client);
     this.userProgress = new DrizzleUserProgressRepository(userProgress, this.client);
+    this.skillTasks = new DrizzleBaseRepository(skillTasks, this.client);
+    this.skillProjects = new DrizzleBaseRepository(skillProjects, this.client);
   }
 
   async transaction<T>(callback: (uow: IUnitOfWork) => Promise<T>): Promise<T> {

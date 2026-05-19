@@ -25,6 +25,9 @@ const PORT = Number(process.env.PORT || 5000);
 
 const app = express();
 
+// Trust the proxy (Replit dev proxy, nginx, etc.) so rate-limit and IP detection work correctly
+app.set("trust proxy", 1);
+
 // --- Security & HTTP Hardening ---
 app.use(helmetOptions);
 app.use(corsOptions);

@@ -1,31 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Trash2, Pencil, ExternalLink, FolderOpen, Check } from "lucide-react";
 import type { SkillAreaData } from "@/types/skills";
 import { cn } from "@/lib/utils";
-
-interface SkillProject {
-  id: string;
-  title: string;
-  desc: string;
-  url: string;
-  tags: string[];
-  createdAt: number;
-}
-
-function loadProjects(areaId: string): SkillProject[] {
-  try {
-    return JSON.parse(localStorage.getItem(`ds-skill-projects-${areaId}`) ?? "[]");
-  } catch {
-    return [];
-  }
-}
-function saveProjects(areaId: string, projects: SkillProject[]) {
-  try {
-    localStorage.setItem(`ds-skill-projects-${areaId}`, JSON.stringify(projects));
-  } catch (err) {
-    console.warn("[projects-section] Failed to save projects:", err);
-  }
-}
+import {
+  getSkillProjects,
+  upsertSkillProject,
+  deleteSkillProject,
+  type SkillProject,
+} from "@/lib/api/skills";
 
 const EMPTY_FORM = () => ({ title: "", desc: "", url: "", tags: "" });
 
@@ -35,14 +17,23 @@ interface Props {
 }
 
 export function ProjectsSection({ data, triggerAdd }: Props) {
-  const [projects, setProjects] = useState<SkillProject[]>(() => loadProjects(data.id));
+  const [projects, setProjects] = useState<SkillProject[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM());
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const rows = await getSkillProjects(data.id);
+    setProjects(rows);
+    setLoading(false);
+  }, [data.id]);
 
   useEffect(() => {
-    setProjects(loadProjects(data.id));
-  }, [data.id]);
+    load();
+  }, [load]);
 
   useEffect(() => {
     if (triggerAdd) {
@@ -52,41 +43,33 @@ export function ProjectsSection({ data, triggerAdd }: Props) {
     }
   }, [triggerAdd]);
 
-  const persist = (next: SkillProject[]) => {
-    setProjects(next);
-    saveProjects(data.id, next);
-  };
-
-  const submit = () => {
-    if (!form.title.trim()) return;
+  const submit = async () => {
+    if (!form.title.trim() || saving) return;
+    setSaving(true);
     const tags = form.tags
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
-    if (editingId) {
-      persist(
-        projects.map((p) =>
-          p.id === editingId
-            ? { ...p, title: form.title.trim(), desc: form.desc.trim(), url: form.url.trim(), tags }
-            : p,
-        ),
-      );
-    } else {
-      persist([
-        ...projects,
-        {
-          id: crypto.randomUUID(),
-          title: form.title.trim(),
-          desc: form.desc.trim(),
-          url: form.url.trim(),
-          tags,
-          createdAt: Date.now(),
-        },
-      ]);
+    try {
+      const saved = await upsertSkillProject({
+        ...(editingId ? { id: editingId } : {}),
+        areaId: data.id,
+        title: form.title.trim(),
+        desc: form.desc.trim(),
+        url: form.url.trim(),
+        tags,
+      });
+      if (editingId) {
+        setProjects((prev) => prev.map((p) => (p.id === editingId ? saved : p)));
+      } else {
+        setProjects((prev) => [...prev, saved]);
+      }
+      setShowForm(false);
+      setEditingId(null);
+      setForm(EMPTY_FORM());
+    } finally {
+      setSaving(false);
     }
-    setShowForm(false);
-    setEditingId(null);
-    setForm(EMPTY_FORM());
   };
 
   const startEdit = (p: SkillProject) => {
@@ -95,7 +78,15 @@ export function ProjectsSection({ data, triggerAdd }: Props) {
     setShowForm(true);
   };
 
-  const remove = (id: string) => persist(projects.filter((p) => p.id !== id));
+  const remove = async (id: string) => {
+    setProjects((prev) => prev.filter((p) => p.id !== id));
+    try {
+      await deleteSkillProject(id);
+    } catch {
+      load();
+    }
+  };
+
   const cancel = () => {
     setShowForm(false);
     setEditingId(null);
@@ -160,10 +151,11 @@ export function ProjectsSection({ data, triggerAdd }: Props) {
           <div className="flex gap-2">
             <button
               onClick={submit}
-              className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-1.5 rounded-lg text-sm font-medium hover:opacity-90"
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-1.5 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
               <Check className="size-3.5" />
-              {editingId ? "Save Changes" : "Add Project"}
+              {saving ? "Saving…" : editingId ? "Save Changes" : "Add Project"}
             </button>
             <button
               onClick={cancel}
@@ -175,7 +167,9 @@ export function ProjectsSection({ data, triggerAdd }: Props) {
         </div>
       )}
 
-      {projects.length > 0 ? (
+      {loading ? (
+        <div className="text-center py-20 text-sm text-muted-foreground">Loading…</div>
+      ) : projects.length > 0 ? (
         <div className="grid sm:grid-cols-2 gap-4">
           {projects.map((p) => (
             <div
@@ -222,7 +216,9 @@ export function ProjectsSection({ data, triggerAdd }: Props) {
                   {p.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium"
+                      className={cn(
+                        "px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium",
+                      )}
                     >
                       {tag}
                     </span>

@@ -8,3 +8,4 @@ export * from "./integrations.js";
 export * from "./interview.js";
 export * from "./cv.js";
 export * from "./planner.js";
+export * from "./skills.js";

@@ -21,6 +21,8 @@ export interface IUnitOfWork {
   authUsers: IRepository<any, any>;
   userProfiles: IRepository<any, any>;
   userProgress: IUserProgressRepository<any, any>;
+  skillTasks: IRepository<any, any>;
+  skillProjects: IRepository<any, any>;
 
   transaction<T>(callback: (uow: IUnitOfWork) => Promise<T>): Promise<T>;
 }

@@ -1,4 +1,4 @@
-import { stripDates, isUUID } from "../../domain/utils.js";
+import { stripDates, isUUID, generateSlug } from "../../domain/utils.js";
 import { IUnitOfWork } from "../../domain/repositories/unit-of-work.interface.js";
 
 export class InterviewService {
@@ -10,7 +10,18 @@ export class InterviewService {
 
   async createQuestion(userId: string, rawData: any) {
     const { id, ...raw } = rawData;
-    const data = stripDates(raw);
+    const data = stripDates(raw) as Record<string, any>;
+
+    // Auto-generate slug from question text if not provided
+    if (!data.slug && data.question) {
+      data.slug = generateSlug(String(data.question));
+    }
+
+    // Auto-set category from area if not provided
+    if (!data.category && data.area) {
+      data.category = String(data.area);
+    }
+
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
       ? [await this.uow.interviewQuestions.findById(safeId)].filter(Boolean)
@@ -34,8 +45,15 @@ export class InterviewService {
       return [];
     }
     const values = items.map(({ id, ...raw }) => {
-      const data = stripDates(raw);
+      const data = stripDates(raw) as Record<string, any>;
       const safeId = isUUID(id) ? id : undefined;
+      // Auto-generate slug and category
+      if (!data.slug && data.question) {
+        data.slug = generateSlug(String(data.question));
+      }
+      if (!data.category && data.area) {
+        data.category = String(data.area);
+      }
       return { ...data, userId, ...(safeId ? { id: safeId } : {}) } as any;
     });
 

@@ -1,30 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Trash2, CheckCircle2, Circle, ClipboardList } from "lucide-react";
 import type { SkillAreaData } from "@/types/skills";
 import { cn } from "@/lib/utils";
-
-interface SkillTask {
-  id: string;
-  title: string;
-  notes: string;
-  done: boolean;
-  createdAt: number;
-}
-
-function loadTasks(areaId: string): SkillTask[] {
-  try {
-    return JSON.parse(localStorage.getItem(`ds-skill-tasks-${areaId}`) ?? "[]");
-  } catch {
-    return [];
-  }
-}
-function saveTasks(areaId: string, tasks: SkillTask[]) {
-  try {
-    localStorage.setItem(`ds-skill-tasks-${areaId}`, JSON.stringify(tasks));
-  } catch (err) {
-    console.warn("[tasks-section] Failed to save tasks:", err);
-  }
-}
+import {
+  getSkillTasks,
+  createSkillTask,
+  toggleSkillTask,
+  deleteSkillTask,
+  type SkillTask,
+} from "@/lib/api/skills";
 
 interface Props {
   data: SkillAreaData;
@@ -32,47 +16,61 @@ interface Props {
 }
 
 export function TasksSection({ data, triggerAdd }: Props) {
-  const [tasks, setTasks] = useState<SkillTask[]>(() => loadTasks(data.id));
+  const [tasks, setTasks] = useState<SkillTask[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "todo" | "done">("all");
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    setTasks(loadTasks(data.id));
+  const load = useCallback(async () => {
+    setLoading(true);
+    const rows = await getSkillTasks(data.id);
+    setTasks(rows);
+    setLoading(false);
   }, [data.id]);
 
   useEffect(() => {
-    if (triggerAdd) {
-      setShowForm(true);
-    }
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    if (triggerAdd) setShowForm(true);
   }, [triggerAdd]);
 
-  const persist = (next: SkillTask[]) => {
-    setTasks(next);
-    saveTasks(data.id, next);
+  const add = async () => {
+    if (!title.trim() || saving) return;
+    setSaving(true);
+    try {
+      const created = await createSkillTask({ areaId: data.id, title: title.trim(), notes: notes.trim() });
+      setTasks((prev) => [...prev, created]);
+      setTitle("");
+      setNotes("");
+      setShowForm(false);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const add = () => {
-    if (!title.trim()) return;
-    persist([
-      ...tasks,
-      {
-        id: crypto.randomUUID(),
-        title: title.trim(),
-        notes: notes.trim(),
-        done: false,
-        createdAt: Date.now(),
-      },
-    ]);
-    setTitle("");
-    setNotes("");
-    setShowForm(false);
+  const toggle = async (id: string, done: boolean) => {
+    try {
+      const updated = await toggleSkillTask(id, !done);
+      setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    } catch {
+      // optimistic revert not needed — just re-load
+      load();
+    }
   };
 
-  const toggle = (id: string) =>
-    persist(tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
-  const remove = (id: string) => persist(tasks.filter((t) => t.id !== id));
+  const remove = async (id: string) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    try {
+      await deleteSkillTask(id);
+    } catch {
+      load();
+    }
+  };
 
   const filtered = tasks.filter((t) =>
     filter === "all" ? true : filter === "todo" ? !t.done : t.done,
@@ -142,9 +140,10 @@ export function TasksSection({ data, triggerAdd }: Props) {
           <div className="flex gap-2">
             <button
               onClick={add}
-              className="bg-primary text-primary-foreground px-4 py-1.5 rounded-lg text-sm font-medium hover:opacity-90"
+              disabled={saving}
+              className="bg-primary text-primary-foreground px-4 py-1.5 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
-              Add
+              {saving ? "Adding…" : "Add"}
             </button>
             <button
               onClick={() => {
@@ -160,14 +159,16 @@ export function TasksSection({ data, triggerAdd }: Props) {
         </div>
       )}
 
-      {filtered.length > 0 ? (
+      {loading ? (
+        <div className="text-center py-20 text-sm text-muted-foreground">Loading…</div>
+      ) : filtered.length > 0 ? (
         <div className="rounded-xl border border-border bg-card divide-y divide-border/60 overflow-hidden shadow-sm">
           {filtered.map((task) => (
             <div
               key={task.id}
               className="flex items-start gap-3 p-4 group hover:bg-muted/30 transition-colors"
             >
-              <button onClick={() => toggle(task.id)} className="mt-0.5 shrink-0">
+              <button onClick={() => toggle(task.id, task.done)} className="mt-0.5 shrink-0">
                 {task.done ? (
                   <CheckCircle2 className="size-5 text-primary" />
                 ) : (
