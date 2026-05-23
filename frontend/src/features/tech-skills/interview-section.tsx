@@ -33,24 +33,13 @@ export function InterviewSection({ data, subAreaId, triggerAdd }: Props) {
     }
   }, [triggerAdd]);
 
-  const activeSubAreaTags = useMemo(() => {
-    if (!subAreaId) return [];
-    const sa = data.subAreas?.find((s) => s.id === subAreaId);
-    return sa?.tags ?? [];
-  }, [data.subAreas, subAreaId]);
-
   const filteredQs = useMemo(
     () =>
       interviewQuestions
         .filter((q) => q.area === data.id)
-        .filter((q) =>
-          activeSubAreaTags.length === 0
-            ? true
-            : q.tags?.some((t) => activeSubAreaTags.includes(t)),
-        )
         .filter((q) => diff === "all" || q.difficulty === diff)
         .filter((q) => !search || q.question.toLowerCase().includes(search.toLowerCase())),
-    [interviewQuestions, data.id, activeSubAreaTags, diff, search],
+    [interviewQuestions, data.id, diff, search],
   );
 
   const toggleExpanded = (id: string) =>
