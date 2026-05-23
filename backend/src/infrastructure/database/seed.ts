@@ -1,4 +1,5 @@
 import { db, pool } from "./index.js";
+import { count as countFn } from "drizzle-orm";
 import { interviewQuestions } from "../../domain/schema/learning.js";
 import { prompts, agents, components, snippets, templates } from "../../domain/schema/core.js";
 import { connectors, socialDrafts, mailTemplates } from "../../domain/schema/integrations.js";
@@ -52,27 +53,32 @@ async function seedGlobalInterviewQuestions() {
   console.log(`Seeded ${rows.length} global interview questions.`);
 }
 
-async function seedTableIfEmpty(table: any, data: any[], name: string) {
-  const existing = await db
-    .select({ id: table.id })
-    .from(table)
-    .limit(1);
-  if (existing.length > 0) {
-    console.log(`${name} already seeded — skipping.`);
+/**
+ * Seeds a table when the current row count is below the seed data count.
+ * Inserts only rows that are missing (by comparing existing count vs seed count).
+ * This allows adding new seed rows without wiping existing user data.
+ */
+async function seedTableIfNeeded(table: any, data: any[], name: string) {
+  const [row] = await db.select({ n: countFn() }).from(table);
+  const existing = Number(row?.n ?? 0);
+
+  if (existing >= data.length) {
+    console.log(`${name} already seeded (${existing} rows) — skipping.`);
     return;
   }
 
-  const rows = data.map(({ id: _id, ...row }) => {
-    const mapped: any = {
-      ...row,
-      userId: "local",
-    };
-    if (row.createdAt) mapped.createdAt = new Date(row.createdAt);
-    if (row.updatedAt) mapped.updatedAt = new Date(row.updatedAt);
+  console.log(`${name}: found ${existing} rows, seed has ${data.length} — upserting new entries…`);
+
+  // Map seed data to DB rows
+  const rows = data.map(({ id: _id, ...rest }) => {
+    const mapped: any = { ...rest, userId: "local" };
+    if (rest.createdAt) mapped.createdAt = new Date(rest.createdAt);
+    if (rest.updatedAt) mapped.updatedAt = new Date(rest.updatedAt);
     return mapped;
   });
 
-  await db.insert(table).values(rows);
+  // Insert all — on conflict do nothing (existing rows are preserved)
+  await db.insert(table).values(rows).onConflictDoNothing();
   console.log(`Seeded ${rows.length} rows into ${name}.`);
 }
 
@@ -80,17 +86,17 @@ export async function runSeeding() {
   // 1. Seed global interview questions
   await seedGlobalInterviewQuestions();
 
-  // 2. Seed core assets
-  await seedTableIfEmpty(prompts, seedPrompts, "prompts");
-  await seedTableIfEmpty(agents, seedAgents, "agents");
-  await seedTableIfEmpty(components, seedComponents, "components");
-  await seedTableIfEmpty(snippets, seedSnippets, "snippets");
-  await seedTableIfEmpty(templates, seedTemplates, "templates");
+  // 2. Seed core assets — will re-seed if new entries were added to seed files
+  await seedTableIfNeeded(prompts, seedPrompts, "prompts");
+  await seedTableIfNeeded(agents, seedAgents, "agents");
+  await seedTableIfNeeded(components, seedComponents, "components");
+  await seedTableIfNeeded(snippets, seedSnippets, "snippets");
+  await seedTableIfNeeded(templates, seedTemplates, "templates");
 
   // 3. Seed integration assets
-  await seedTableIfEmpty(connectors, seedConnectors, "connectors");
-  await seedTableIfEmpty(socialDrafts, seedSocialDrafts, "socialDrafts");
-  await seedTableIfEmpty(mailTemplates, seedMailTemplates, "mailTemplates");
+  await seedTableIfNeeded(connectors, seedConnectors, "connectors");
+  await seedTableIfNeeded(socialDrafts, seedSocialDrafts, "socialDrafts");
+  await seedTableIfNeeded(mailTemplates, seedMailTemplates, "mailTemplates");
 }
 
 async function main() {
