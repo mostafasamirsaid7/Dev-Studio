@@ -5,7 +5,7 @@ import {
   Utensils,
   LucideIcon,
 } from "lucide-react";
-import { STORAGE_KEYS } from "../../constants/system";
+import { STORAGE_KEYS } from "@/types/system";
 
 export interface ActivityItem {
   id: string;

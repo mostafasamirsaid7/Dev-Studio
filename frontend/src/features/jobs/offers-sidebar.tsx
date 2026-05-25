@@ -2,8 +2,8 @@ import { Plus, Handshake, Search } from "lucide-react";
 import { useState } from "react";
 import { usePagination } from "@/hooks/use-pagination";
 import { ListPagination } from "@/components/ui/list-pagination";
-import type { FreelanceOffer } from "./types";
-import { STATUS_COLORS, PLATFORM_COLORS } from "./types";
+import type { FreelanceOffer } from "@/types/jobs";
+import { STATUS_COLORS, PLATFORM_COLORS } from "@/types/jobs";
 
 interface Props {
   offers: FreelanceOffer[];

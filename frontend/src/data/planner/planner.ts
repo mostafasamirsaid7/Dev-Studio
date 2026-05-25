@@ -11,6 +11,8 @@ import {
   Monitor,
 } from "lucide-react";
 
+export type { StatusFilter, WeekTheme } from "@/types/planner";
+
 export const CATEGORY_LABELS: Record<TaskCategory, string> = {
   activities: "Activities",
   work: "Work Block",
@@ -101,25 +103,14 @@ export const STATUS_CLASSES: Record<TaskStatus, string> = {
   done: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
 };
 
-export type StatusFilter = "all" | "todo" | "in-progress" | "done";
-
-export const STATUS_FILTERS: { id: StatusFilter; label: string; color: string }[] = [
+export const STATUS_FILTERS: { id: import("@/types/planner").StatusFilter; label: string; color: string }[] = [
   { id: "all", label: "All", color: "text-foreground" },
   { id: "todo", label: "Todo", color: "text-muted-foreground" },
   { id: "in-progress", label: "Active", color: "text-primary" },
   { id: "done", label: "Done", color: "text-emerald-600" },
 ];
 
-export interface WeekTheme {
-  week: number;
-  title: string;
-  subtitle: string;
-  icon: LucideIcon;
-  color: string;
-  tags: string[];
-}
-
-export const WEEK_THEMES: WeekTheme[] = [
+export const WEEK_THEMES: import("@/types/planner").WeekTheme[] = [
   {
     week: 1,
     title: "DevOps & Security",

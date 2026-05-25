@@ -1,0 +1,255 @@
+import { useState } from "react";
+import {
+  Moon,
+  MapPin,
+  RefreshCw,
+  AlertCircle,
+  Timer,
+  Check,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { usePrayerTimes } from "@/hooks/use-prayer-times";
+import { PRAYER_TRACKER_KEY } from "@/data/planner/activities";
+import { to24hMin, formatCountdown, formatTime12, toDateStr } from "@/lib/utils/planner";
+
+/* ── Prayer tracker storage ──────────────────────── */
+function loadPrayerTracker(dateKey: string): Record<string, boolean> {
+  try {
+    return JSON.parse(localStorage.getItem(`${PRAYER_TRACKER_KEY}-${dateKey}`) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+function savePrayerTracker(dateKey: string, data: Record<string, boolean>) {
+  try {
+    localStorage.setItem(`${PRAYER_TRACKER_KEY}-${dateKey}`, JSON.stringify(data));
+  } catch (err) {
+    console.warn("[activities] Failed to save prayer tracker:", err);
+  }
+}
+
+/* ── PrayerPanel ─────────────────────────────────── */
+export function PrayerPanel() {
+  const { prayers, loading, error, city, nextIdx, nowMin, refresh } = usePrayerTimes();
+  const today = toDateStr(new Date());
+  const [prayed, setPrayed] = useState<Record<string, boolean>>(() => loadPrayerTracker(today));
+
+  const nextPrayer = nextIdx >= 0 ? prayers[nextIdx] : null;
+  const diffMin = nextPrayer ? to24hMin(nextPrayer.time) - nowMin : 0;
+  const adjustedDiff = diffMin < 0 ? diffMin + 24 * 60 : diffMin;
+
+  const togglePrayed = (name: string) => {
+    const updated = { ...prayed, [name]: !prayed[name] };
+    setPrayed(updated);
+    savePrayerTracker(today, updated);
+  };
+
+  const prayedCount = prayers.filter((p) => prayed[p.name]).length;
+
+  return (
+    <div className="p-4 space-y-5">
+      {/* ── Timer card ── */}
+      <div className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 text-center space-y-3 shadow-sm">
+        <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
+          <MapPin className="size-3.5" />
+          <span>{city || "Detecting location…"}</span>
+        </div>
+
+        {loading && (
+          <div className="py-8 flex flex-col items-center gap-3">
+            <RefreshCw className="size-8 text-primary animate-spin" />
+            <p className="text-sm text-muted-foreground">Loading prayer times…</p>
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="rounded-2xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive flex items-center gap-2">
+            <AlertCircle className="size-4 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && nextPrayer && (
+          <>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/60 mb-2">
+                Next Prayer
+              </p>
+              <div className="flex items-center justify-center gap-3">
+                <div
+                  className={cn(
+                    "size-12 rounded-2xl flex items-center justify-center border",
+                    nextPrayer.iconColor.replace("text-", "bg-") + "/10",
+                    nextPrayer.iconColor.replace("text-", "border-") + "/20",
+                  )}
+                >
+                  <nextPrayer.Icon className={cn("size-6", nextPrayer.iconColor)} />
+                </div>
+                <div className="text-left">
+                  <p className="text-2xl font-bold">{nextPrayer.name}</p>
+                  <p className="text-base text-muted-foreground">{nextPrayer.arabicName}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-6 py-2">
+              <p className="text-4xl font-bold font-mono text-primary tabular-nums">
+                {formatTime12(nextPrayer.time)}
+              </p>
+              <div className="h-12 w-px bg-border" />
+              <div className="text-center">
+                <p className="text-3xl font-bold font-mono tabular-nums">
+                  {formatCountdown(adjustedDiff)}
+                </p>
+                <p className="text-xs text-muted-foreground flex items-center gap-1 justify-center mt-0.5">
+                  <Timer className="size-3" /> remaining
+                </p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {!loading && !error && prayers.length > 0 && (
+          <button
+            onClick={refresh}
+            className="text-[11px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 mx-auto px-3 py-1.5 rounded-lg hover:bg-muted/40"
+          >
+            <RefreshCw className="size-3" /> Refresh location
+          </button>
+        )}
+      </div>
+
+      {/* ── Prayer activity tracker ── */}
+      {!loading && !error && prayers.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Moon className="size-4 text-indigo-500" />
+              <span className="text-sm font-semibold">Prayer Tracker</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-bold text-indigo-500">
+                {prayedCount}/{prayers.length}
+              </span>
+              <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-indigo-500 transition-all duration-500"
+                  style={{
+                    width: `${prayers.length > 0 ? (prayedCount / prayers.length) * 100 : 0}%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {prayers.map((prayer, i) => {
+              const isNext = i === nextIdx;
+              const isPast = to24hMin(prayer.time) < nowMin && !isNext;
+              const isDone = !!prayed[prayer.name];
+              const isMissed = isPast && !isDone;
+              const PIcon = prayer.Icon;
+
+              return (
+                <button
+                  key={prayer.name}
+                  onClick={() => togglePrayed(prayer.name)}
+                  className={cn(
+                    "relative flex flex-col items-center gap-2 rounded-2xl border p-4 text-center transition-all cursor-pointer group",
+                    isDone
+                      ? "bg-emerald-500/10 border-emerald-500/30 shadow-sm ring-1 ring-emerald-500/20"
+                      : isMissed
+                        ? "bg-amber-500/5 border-amber-500/20 opacity-70 hover:opacity-100 hover:border-amber-500/40"
+                        : isNext
+                          ? "bg-primary/8 border-primary/25 shadow-sm hover:bg-primary/12"
+                          : "border-border/40 bg-muted/20 hover:bg-muted/40 hover:border-border/60",
+                  )}
+                >
+                  {isDone && (
+                    <span className="absolute top-2 right-2 size-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                      <Check className="size-2.5 text-white" strokeWidth={3} />
+                    </span>
+                  )}
+                  {isNext && !isDone && (
+                    <span className="absolute top-2.5 right-2.5 size-1.5 rounded-full bg-primary animate-pulse" />
+                  )}
+
+                  <div
+                    className={cn(
+                      "size-10 rounded-xl flex items-center justify-center shrink-0 transition-all",
+                      isDone
+                        ? "bg-emerald-500/15"
+                        : prayer.iconColor.replace("text-", "bg-") + "/10",
+                    )}
+                  >
+                    <PIcon
+                      className={cn(
+                        "size-5 transition-all",
+                        isDone ? "text-emerald-600" : prayer.iconColor,
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-0.5">
+                    <p
+                      className={cn(
+                        "text-sm font-bold leading-tight",
+                        isDone ? "text-emerald-700 dark:text-emerald-400" : "text-foreground",
+                      )}
+                    >
+                      {prayer.name}
+                    </p>
+                    <p
+                      className={cn(
+                        "text-[11px] font-medium",
+                        isDone ? "text-emerald-600/70" : "text-muted-foreground",
+                      )}
+                    >
+                      {prayer.arabicName}
+                    </p>
+                  </div>
+
+                  <p
+                    className={cn(
+                      "text-sm font-bold font-mono tabular-nums",
+                      isDone ? "text-emerald-600" : prayer.iconColor,
+                    )}
+                  >
+                    {formatTime12(prayer.time)}
+                  </p>
+
+                  {isDone ? (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600">
+                      Prayed ✓
+                    </span>
+                  ) : isNext ? (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                      in {formatCountdown(adjustedDiff)}
+                    </span>
+                  ) : isMissed ? (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">
+                      Tap to log
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-muted-foreground/50 font-medium">
+                      upcoming
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {prayedCount === prayers.length && prayers.length > 0 && (
+            <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+              <Check className="size-4 text-emerald-600 shrink-0" />
+              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                All prayers completed today — ما شاء الله!
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

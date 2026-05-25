@@ -2,8 +2,8 @@ import { Plus, Star, Search } from "lucide-react";
 import { useState } from "react";
 import { usePagination } from "@/hooks/use-pagination";
 import { ListPagination } from "@/components/ui/list-pagination";
-import type { MyService } from "./types";
-import { STATUS_COLORS, PLATFORM_COLORS } from "./types";
+import type { MyService } from "@/types/jobs";
+import { STATUS_COLORS, PLATFORM_COLORS } from "@/types/jobs";
 
 interface Props {
   services: MyService[];

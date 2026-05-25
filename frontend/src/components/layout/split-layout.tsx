@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useUIStore } from "@/lib/ui-store";
+import { useUIStore } from "@/lib/store/ui";
 
 interface SplitLayoutProps {
   sidebar: React.ReactNode;

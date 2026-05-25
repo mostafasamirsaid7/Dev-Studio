@@ -141,6 +141,19 @@ export const STATUS_COLORS: Record<string, string> = {
   draft: "bg-muted text-muted-foreground border-border",
 };
 
+export interface ScrapedJob {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  url: string;
+  source: string;
+  postedAt: string;
+  tags?: string[];
+  salary?: string;
+  logo?: string;
+}
+
 export const PLATFORM_COLORS: Record<string, string> = {
   Fiverr: "bg-emerald-500/15 text-emerald-400",
   Mostaql: "bg-amber-500/15 text-amber-400",

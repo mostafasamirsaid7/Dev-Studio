@@ -2,8 +2,8 @@ import { Plus, Briefcase, Search } from "lucide-react";
 import { useState } from "react";
 import { usePagination } from "@/hooks/use-pagination";
 import { ListPagination } from "@/components/ui/list-pagination";
-import type { SavedJob } from "./types";
-import { STATUS_COLORS, JOB_STATUSES } from "./types";
+import type { SavedJob } from "@/types/jobs";
+import { STATUS_COLORS, JOB_STATUSES } from "@/types/jobs";
 
 interface Props {
   jobs: SavedJob[];

@@ -8,99 +8,16 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { checkATS } from "@/lib/api/cv";
 import type { CVProfile, ATSResult } from "@/types/cv";
 import { Button } from "@/components/ui/button";
+import { ScoreRing } from "./components/score-ring";
+import { SectionBar } from "./components/section-bar";
 
 interface ATSCheckerProps {
   cvProfile: CVProfile;
-}
-
-function ScoreRing({ score }: { score: number }) {
-  const r = 36;
-  const circ = 2 * Math.PI * r;
-  const dash = (score / 100) * circ;
-  const color =
-    score >= 80 ? "#22c55e" : score >= 60 ? "#f59e0b" : score >= 40 ? "#f97316" : "#ef4444";
-
-  return (
-    <div className="relative size-24 flex items-center justify-center">
-      <svg width="96" height="96" className="-rotate-90">
-        <circle
-          cx="48"
-          cy="48"
-          r={r}
-          stroke="currentColor"
-          strokeWidth="6"
-          fill="none"
-          className="text-muted/30"
-        />
-        <circle
-          cx="48"
-          cy="48"
-          r={r}
-          stroke={color}
-          strokeWidth="6"
-          fill="none"
-          strokeDasharray={`${dash} ${circ}`}
-          strokeLinecap="round"
-        />
-      </svg>
-      <div className="absolute flex flex-col items-center">
-        <span className="text-2xl font-bold" style={{ color }}>
-          {score}
-        </span>
-        <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-wider">
-          / 100
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function SectionBar({
-  label,
-  score,
-  feedback,
-}: {
-  label: string;
-  score: number;
-  feedback: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const color =
-    score >= 80
-      ? "bg-green-500"
-      : score >= 60
-        ? "bg-yellow-500"
-        : score >= 40
-          ? "bg-orange-500"
-          : "bg-red-500";
-
-  return (
-    <div className="space-y-1">
-      <button onClick={() => setOpen((o) => !o)} className="w-full flex items-center gap-3 group">
-        <span className="text-xs text-muted-foreground w-24 text-left shrink-0">{label}</span>
-        <div className="flex-1 bg-muted/40 rounded-full h-1.5 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${color}`}
-            style={{ width: `${score}%` }}
-          />
-        </div>
-        <span className="text-xs font-medium w-8 text-right">{score}</span>
-        {open ? (
-          <ChevronUp className="size-3 text-muted-foreground" />
-        ) : (
-          <ChevronDown className="size-3 text-muted-foreground" />
-        )}
-      </button>
-      {open && <p className="text-xs text-muted-foreground pl-[108px] pr-10">{feedback}</p>}
-    </div>
-  );
 }
 
 export function ATSChecker({ cvProfile }: ATSCheckerProps) {
@@ -285,7 +202,6 @@ export function ATSChecker({ cvProfile }: ATSCheckerProps) {
 
         {result && !loading && (
           <div className="space-y-5">
-            {/* Score Overview */}
             <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-5">
               <ScoreRing score={result.score} />
               <div className="flex-1 min-w-0">
@@ -301,56 +217,27 @@ export function ATSChecker({ cvProfile }: ATSCheckerProps) {
               </div>
             </div>
 
-            {/* Section Scores */}
             <div className="bg-card border border-border rounded-xl p-4 space-y-3">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Section Scores
               </h4>
-              <SectionBar
-                label="Summary"
-                score={result.sectionScores.summary.score}
-                feedback={result.sectionScores.summary.feedback}
-              />
-              <SectionBar
-                label="Experience"
-                score={result.sectionScores.experience.score}
-                feedback={result.sectionScores.experience.feedback}
-              />
-              <SectionBar
-                label="Skills"
-                score={result.sectionScores.skills.score}
-                feedback={result.sectionScores.skills.feedback}
-              />
-              <SectionBar
-                label="Education"
-                score={result.sectionScores.education.score}
-                feedback={result.sectionScores.education.feedback}
-              />
-              <SectionBar
-                label="Projects"
-                score={result.sectionScores.projects.score}
-                feedback={result.sectionScores.projects.feedback}
-              />
+              <SectionBar label="Summary" score={result.sectionScores.summary.score} feedback={result.sectionScores.summary.feedback} />
+              <SectionBar label="Experience" score={result.sectionScores.experience.score} feedback={result.sectionScores.experience.feedback} />
+              <SectionBar label="Skills" score={result.sectionScores.skills.score} feedback={result.sectionScores.skills.feedback} />
+              <SectionBar label="Education" score={result.sectionScores.education.score} feedback={result.sectionScores.education.feedback} />
+              <SectionBar label="Projects" score={result.sectionScores.projects.score} feedback={result.sectionScores.projects.feedback} />
             </div>
 
-            {/* Keywords */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bg-card border border-border rounded-xl p-4 space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="size-4 text-green-400" />
                   <h4 className="text-xs font-semibold">Matched Keywords</h4>
-                  <span className="text-xs text-muted-foreground ml-auto">
-                    {result.matchedKeywords.length}
-                  </span>
+                  <span className="text-xs text-muted-foreground ml-auto">{result.matchedKeywords.length}</span>
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {result.matchedKeywords.map((kw) => (
-                    <span
-                      key={kw}
-                      className="text-[11px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20"
-                    >
-                      {kw}
-                    </span>
+                    <span key={kw} className="text-[11px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">{kw}</span>
                   ))}
                 </div>
               </div>
@@ -358,24 +245,16 @@ export function ATSChecker({ cvProfile }: ATSCheckerProps) {
                 <div className="flex items-center gap-2">
                   <XCircle className="size-4 text-red-400" />
                   <h4 className="text-xs font-semibold">Missing Keywords</h4>
-                  <span className="text-xs text-muted-foreground ml-auto">
-                    {result.missingKeywords.length}
-                  </span>
+                  <span className="text-xs text-muted-foreground ml-auto">{result.missingKeywords.length}</span>
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {result.missingKeywords.map((kw) => (
-                    <span
-                      key={kw}
-                      className="text-[11px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20"
-                    >
-                      {kw}
-                    </span>
+                    <span key={kw} className="text-[11px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20">{kw}</span>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Suggestions */}
             {result.suggestions.length > 0 && (
               <div className="bg-card border border-border rounded-xl p-4 space-y-2">
                 <div className="flex items-center gap-2">
@@ -393,7 +272,6 @@ export function ATSChecker({ cvProfile }: ATSCheckerProps) {
               </div>
             )}
 
-            {/* Focus Insights */}
             {result.focusInsights?.length > 0 && (
               <div className="bg-card border border-border rounded-xl p-4 space-y-2">
                 <div className="flex items-center gap-2">
@@ -409,13 +287,7 @@ export function ATSChecker({ cvProfile }: ATSCheckerProps) {
                   {result.focusInsights.map((s, i) => (
                     <li key={i} className="text-xs text-muted-foreground flex gap-2">
                       <span className="text-primary shrink-0 mt-px">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="10"
-                          height="10"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
                           <circle cx="12" cy="12" r="5" />
                         </svg>
                       </span>

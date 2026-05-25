@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Loader2, Trash2, ExternalLink, Star } from "lucide-react";
-import type { MyService, ServiceStatus } from "./types";
-import { SERVICE_STATUSES, SERVICE_PLATFORMS } from "./types";
+import type { MyService, ServiceStatus } from "@/types/jobs";
+import { SERVICE_STATUSES, SERVICE_PLATFORMS } from "@/types/jobs";
 import { toast } from "sonner";
 
 interface Props {

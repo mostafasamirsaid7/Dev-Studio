@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Loader2, Trash2, ExternalLink, Handshake } from "lucide-react";
-import type { FreelanceOffer, OfferStatus } from "./types";
-import { OFFER_STATUSES, OFFER_PLATFORMS, OFFER_CATEGORIES } from "./types";
+import type { FreelanceOffer, OfferStatus } from "@/types/jobs";
+import { OFFER_STATUSES, OFFER_PLATFORMS, OFFER_CATEGORIES } from "@/types/jobs";
 import { toast } from "sonner";
 
 interface Props {

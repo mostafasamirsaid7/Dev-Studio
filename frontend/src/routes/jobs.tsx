@@ -2,8 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { PageContainer, PageHeader, PageSection, TabNav } from "@/components/layout";
-import { SplitLayout } from "@/components/layout/split-layout";
+import { PageContainer, PageHeader, PageSection, TabNav, SplitLayout } from "@/components/layout";
 import { Briefcase } from "lucide-react";
 import { JobsSidebar } from "@/features/jobs/jobs-sidebar";
 import { JobEditor } from "@/features/jobs/job-editor";
@@ -11,7 +10,7 @@ import { OffersSidebar } from "@/features/jobs/offers-sidebar";
 import { OfferEditor } from "@/features/jobs/offer-editor";
 import { ServicesSidebar } from "@/features/jobs/services-sidebar";
 import { ServiceEditor } from "@/features/jobs/service-editor";
-import type { SavedJob, FreelanceOffer, MyService } from "@/features/jobs/types";
+import type { SavedJob, FreelanceOffer, MyService } from "@/types/jobs";
 import {
   getSavedJobs,
   saveJob,

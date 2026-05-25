@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, ExternalLink, Loader2, Trash2 } from "lucide-react";
-import type { SavedJob, JobStatus } from "./types";
-import { JOB_STATUSES, JOB_PLATFORMS, JOB_CATEGORIES } from "./types";
+import type { SavedJob, JobStatus } from "@/types/jobs";
+import { JOB_STATUSES, JOB_PLATFORMS, JOB_CATEGORIES } from "@/types/jobs";
 import { JobBrowser } from "./job-browser";
 import { toast } from "sonner";
 

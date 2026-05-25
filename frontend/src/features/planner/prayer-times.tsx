@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Moon, MapPin, RefreshCw, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePrayerTimes } from "@/hooks/use-prayer-times";
-import { to24hMin, formatCountdown, toDateStr } from "@/lib/planner-utils";
+import { to24hMin, formatCountdown, toDateStr } from "@/lib/utils/planner";
 
 interface PrayerTimesProps {
   date: string;

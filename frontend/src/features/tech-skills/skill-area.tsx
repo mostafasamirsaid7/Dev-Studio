@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   BookOpen,
-  CheckSquare,
   ExternalLink,
   GraduationCap,
   Search,
@@ -12,14 +11,13 @@ import {
 } from "lucide-react";
 import type { SkillAreaData } from "@/types/skills";
 import { OverviewSection } from "./overview-section";
-import { ChecklistSection } from "./checklist-section";
 import { InterviewSection } from "./interview-section";
 import { ResourcesSection } from "./resources-section";
 import { ServicesSection } from "./services-section";
 import { SplitLayout, TabNav } from "../../components/layout";
 import { cn } from "@/lib/utils";
 
-type SectionId = "overview" | "checklist" | "interview" | "resources" | "services";
+type SectionId = "overview" | "interview" | "resources" | "services";
 
 interface SubAreaTab {
   id: string;
@@ -29,7 +27,6 @@ interface SubAreaTab {
 
 const SECTIONS: { id: SectionId; label: string; icon: React.ElementType }[] = [
   { id: "overview", label: "Overview", icon: BookOpen },
-  { id: "checklist", label: "Checklist", icon: CheckSquare },
   { id: "interview", label: "Interview Q&A", icon: GraduationCap },
   { id: "resources", label: "Resources", icon: ExternalLink },
   { id: "services", label: "Services", icon: Layers },
@@ -340,7 +337,6 @@ export function SkillArea({
             {activeSection === "overview" && (
               <OverviewSection data={data} subArea={subArea} onSubAreaChange={setSubArea} />
             )}
-            {activeSection === "checklist" && <ChecklistSection data={data} />}
             {activeSection === "interview" && (
               <InterviewSection data={data} subAreaId={subArea} triggerAdd={addTrigger} />
             )}

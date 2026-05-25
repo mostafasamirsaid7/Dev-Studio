@@ -1,45 +1,16 @@
 import { useState } from "react";
-import {
-  Search,
-  Loader2,
-  RefreshCw,
-  Bookmark,
-  ExternalLink,
-  AlertCircle,
-  MapPin,
-} from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import type { SavedJob } from "./types";
-
-interface ScrapedJob {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  url: string;
-  source: string;
-  postedAt: string;
-  tags?: string[];
-  salary?: string;
-  logo?: string;
-}
-
-const FREELANCE_SOURCES = new Set(["mostaql", "khamsat"]);
+import type { SavedJob } from "@/types/jobs";
+import type { ScrapedJob } from "@/types/jobs";
+import { SOURCE_PLATFORM_NAME } from "@/data/jobs/jobs";
+import { JobCard, FREELANCE_SOURCES } from "./components/job-card";
+import { BrowserControls } from "./components/browser-controls";
+import { CATEGORIES } from "@/data/jobs/jobs";
 
 interface Props {
   onSaveJob: (job: Partial<SavedJob>) => Promise<void>;
   onSaveOffer?: (job: ScrapedJob) => Promise<void>;
-}
-import { CATEGORIES, TIME_OPTIONS, SOURCES, SOURCE_BADGE, SOURCE_PLATFORM_NAME } from "@/data/jobs/jobs";
-
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const h = Math.floor(diff / 3_600_000);
-  if (h < 1) return "Just now";
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d ago`;
-  return `${Math.floor(d / 7)}w ago`;
 }
 
 export function JobBrowser({ onSaveJob, onSaveOffer }: Props) {
@@ -56,7 +27,7 @@ export function JobBrowser({ onSaveJob, onSaveOffer }: Props) {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [savingOfferId, setSavingOfferId] = useState<string | null>(null);
 
-  const pickCategory = (cat: (typeof CATEGORIES)[0]) => {
+  const pickCategory = (cat: (typeof CATEGORIES)[number]) => {
     setCategory(cat.id);
     setQuery(cat.query);
   };
@@ -126,128 +97,24 @@ export function JobBrowser({ onSaveJob, onSaveOffer }: Props) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* ── Controls ── */}
-      <div className="shrink-0 border-b border-border bg-background p-4 space-y-3">
-        {/* Category pills */}
-        <div className="flex flex-wrap gap-1.5">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => pickCategory(cat)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
-                category === cat.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+      <BrowserControls
+        category={category}
+        query={query}
+        location={location}
+        days={days}
+        sources={sources}
+        loading={loading}
+        fetched={fetched}
+        errors={errors}
+        linkedInUrl={linkedInUrl}
+        onPickCategory={pickCategory}
+        onQueryChange={(q) => { setQuery(q); setCategory(""); }}
+        onLocationChange={setLocation}
+        onDaysChange={setDays}
+        onToggleSource={toggleSource}
+        onSearch={handleSearch}
+      />
 
-        {/* Query + location row */}
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setCategory("");
-              }}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              placeholder="Job title or skills…"
-              className="w-full pl-8 pr-3 py-2 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-          </div>
-          <div className="relative">
-            <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              placeholder="Location"
-              className="w-32 pl-7 pr-3 py-2 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-          </div>
-        </div>
-
-        {/* Time + sources + LinkedIn + Search button */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Time segment */}
-          <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5 shrink-0">
-            {TIME_OPTIONS.map((t) => (
-              <button
-                key={t.value}
-                onClick={() => setDays(t.value)}
-                className={`px-2 py-1 text-[11px] font-medium rounded-md transition-colors ${
-                  days === t.value
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Source toggles */}
-          <div className="flex items-center gap-1 flex-wrap">
-            {SOURCES.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => toggleSource(s.id)}
-                className={`px-2 py-1 text-[11px] font-medium rounded-md border transition-all ${
-                  sources.includes(s.id)
-                    ? s.color
-                    : "bg-transparent text-muted-foreground/40 border-border"
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-
-          {/* LinkedIn link */}
-          <a
-            href={linkedInUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md border border-sky-500/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 transition-colors"
-          >
-            <ExternalLink className="size-3" /> LinkedIn
-          </a>
-
-          {/* Search */}
-          <button
-            onClick={handleSearch}
-            disabled={loading || !sources.length}
-            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50 transition-opacity shrink-0"
-          >
-            {loading ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="size-3.5" />
-            )}
-            {fetched ? "Refresh" : "Search Jobs"}
-          </button>
-        </div>
-
-        {/* Source error notice */}
-        {errors.length > 0 && (
-          <div className="flex items-center gap-1.5 text-[11px] text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 rounded-md px-2.5 py-1.5">
-            <AlertCircle className="size-3.5 shrink-0" />
-            <span>
-              Could not reach: <strong>{errors.join(", ")}</strong>. Results shown from other
-              sources.
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* ── Results ── */}
       <div className="flex-1 overflow-y-auto p-4">
         {!fetched && (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
@@ -256,7 +123,7 @@ export function JobBrowser({ onSaveJob, onSaveOffer }: Props) {
             </div>
             <p className="text-sm font-semibold">Browse Jobs from Top Sites</p>
             <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
-              Search across <strong>Indeed</strong>, <strong>Wuzzuf</strong>, <strong>Bayt</strong>,
+              Search across <strong>Indeed</strong>, <strong>Wuzzuf</strong>, <strong>Bayt</strong>,{" "}
               <strong>RemoteOK</strong>, <strong>Mostaql</strong>, and <strong>Khamsat</strong> at
               once. Default: <em>Full Stack Developer</em> — last 24 hours.
             </p>
@@ -293,106 +160,16 @@ export function JobBrowser({ onSaveJob, onSaveOffer }: Props) {
                 <span className="ml-1 text-yellow-400/80">({errors.join(", ")} unavailable)</span>
               )}
             </p>
-
             {results.map((job) => (
-              <div
+              <JobCard
                 key={job.id}
-                className="rounded-lg border border-border bg-card p-3.5 hover:border-ring/30 transition-colors"
-              >
-                <div className="flex items-start gap-3">
-                  {job.logo && (
-                    <img
-                      src={job.logo}
-                      alt={job.company}
-                      className="size-8 rounded-md object-contain bg-muted border border-border shrink-0"
-                      onError={(e) =>
-                        ((e.currentTarget as HTMLImageElement).style.display = "none")
-                      }
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium leading-snug line-clamp-1">{job.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                          {job.company}
-                          {job.company && job.location ? " · " : ""}
-                          {job.location}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span
-                          className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${SOURCE_BADGE[job.source] ?? "bg-muted text-muted-foreground"}`}
-                        >
-                          {job.source}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {timeAgo(job.postedAt)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 mt-2">
-                      {job.tags && job.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 flex-1">
-                          {job.tags.slice(0, 5).map((t) => (
-                            <span
-                              key={t}
-                              className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      {job.salary && (
-                        <span className="text-[11px] text-green-400 font-medium whitespace-nowrap">
-                          {job.salary}
-                        </span>
-                      )}
-                      <div className="flex items-center gap-1 ml-auto shrink-0">
-                        <a
-                          href={job.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="size-6 grid place-items-center rounded border border-border hover:bg-sidebar-accent/40 text-muted-foreground hover:text-foreground transition-colors"
-                          title="Open listing"
-                        >
-                          <ExternalLink className="size-3" />
-                        </a>
-                        {FREELANCE_SOURCES.has(job.source) && onSaveOffer ? (
-                          <button
-                            onClick={() => handleSaveAsOffer(job)}
-                            disabled={savingOfferId === job.id}
-                            className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 rounded transition-colors disabled:opacity-50"
-                            title="Track this project as a freelance offer"
-                          >
-                            {savingOfferId === job.id ? (
-                              <Loader2 className="size-3 animate-spin" />
-                            ) : (
-                              <Bookmark className="size-3" />
-                            )}
-                            Add Offer
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleSave(job)}
-                            disabled={savingId === job.id}
-                            className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium bg-primary/10 text-primary hover:bg-primary/20 rounded transition-colors disabled:opacity-50"
-                          >
-                            {savingId === job.id ? (
-                              <Loader2 className="size-3 animate-spin" />
-                            ) : (
-                              <Bookmark className="size-3" />
-                            )}
-                            Save
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                job={job}
+                savingId={savingId}
+                savingOfferId={savingOfferId}
+                hasOfferSave={!!onSaveOffer}
+                onSave={handleSave}
+                onSaveAsOffer={handleSaveAsOffer}
+              />
             ))}
           </div>
         )}

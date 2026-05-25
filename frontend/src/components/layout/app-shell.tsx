@@ -28,7 +28,7 @@ import {
   CalendarCheck,
 } from "lucide-react";
 import { CommandPalette } from "./command-palette";
-import { ErrorBoundary } from "./error-boundary";
+import { ErrorBoundary } from "@/components/errors";
 import { PresenceIndicator } from "./presence-indicator";
 import { UserMenu } from "@/features/auth/user-menu";
 import { useAuth } from "@/hooks/use-auth";
@@ -265,7 +265,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-muted/30">
+    <div className="flex h-screen h-dvh w-full overflow-hidden bg-muted/30">
       {/* Mobile backdrop */}
       {mobileOpen && (
         <div
@@ -416,7 +416,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </TooltipProvider>
 
       {/* ── Main area ────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 p-2 pl-0 md:pl-0 gap-2">
+      <div className="flex-1 flex flex-col min-w-0 p-2 md:pl-0 gap-2">
         {/* ── Top header bar ───────────────────────── */}
         <header className="shrink-0 flex items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-background/80 backdrop-blur-sm border border-border/60 shadow-sm relative z-[100]">
           {/* Left: sidebar toggle */}
@@ -519,7 +519,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
                 {/* Notification dropdown */}
                 {notifOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl border border-border/60 bg-background/95 backdrop-blur-sm shadow-lg z-[9999] overflow-hidden">
+                  <div className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-1rem))] rounded-2xl border border-border/60 bg-background/95 backdrop-blur-sm shadow-lg z-[9999] overflow-hidden">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
                       <div className="flex items-center gap-2">
