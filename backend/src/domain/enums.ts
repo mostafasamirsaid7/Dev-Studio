@@ -223,6 +223,16 @@ export const ACTIVITY_ENTITY_TYPES = [
 ] as const;
 export type ActivityEntityType = (typeof ACTIVITY_ENTITY_TYPES)[number];
 
+// --- Currencies ---
+
+export const CURRENCIES = ["USD", "EUR", "SAR", "EGP", "AED", "GBP"] as const;
+export type Currency = (typeof CURRENCIES)[number];
+
+// --- Activity Types ---
+
+export const ACTIVITY_TYPES = ["prayer", "sports", "care", "food"] as const;
+export type ActivityType = (typeof ACTIVITY_TYPES)[number];
+
 // --- Integrations Enums ---
 
 export const CONNECTOR_TYPES = ["companies", "hr", "clients"] as const;

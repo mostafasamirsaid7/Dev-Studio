@@ -1,24 +1,12 @@
 import { ElementType } from "react";
+import type { TechAreaId, ServiceCategory } from "@shared/enums";
+
+export type { TechAreaId, ServiceCategory };
 
 /**
  * Tech Skills Type Definitions
  * Centralized types for all tech skill areas and related data structures
  */
-
-// ── Tech Skill Area IDs ────────────────────────────────────────────────────────
-
-export type TechAreaId =
-  | "frontend"
-  | "backend"
-  | "devops"
-  | "testing"
-  | "database"
-  | "design-patterns"
-  | "architecture"
-  | "system-design"
-  | "microservices"
-  | "security"
-  | "performance";
 
 // ── Shared Skill Concepts ──────────────────────────────────────────────────────
 
@@ -39,17 +27,6 @@ export interface SkillChecklistItem {
 }
 
 // ── Service Integration Types ──────────────────────────────────────────────────
-
-export type ServiceCategory =
-  | "auth"
-  | "payment"
-  | "email"
-  | "cache"
-  | "queue"
-  | "storage"
-  | "realtime"
-  | "monitoring"
-  | "search";
 
 export interface ServiceSnippet {
   lang: string;

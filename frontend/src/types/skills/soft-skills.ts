@@ -1,15 +1,14 @@
 import { ElementType } from "react";
+import type { SoftAreaId } from "@shared/enums";
 import { FocusArea, Difficulty, AnswerDepth } from "../common";
 import { SkillConcept, SkillResource, SkillChecklistItem } from "./tech-skills";
+
+export type { SoftAreaId };
 
 /**
  * Soft Skills Type Definitions
  * Centralized types for all soft skill areas and related data structures
  */
-
-// ── Soft Skill Area IDs ────────────────────────────────────────────────────────
-
-export type SoftAreaId = "softskills";
 
 // ── Soft Skill Scenarios & Questions ───────────────────────────────────────────
 

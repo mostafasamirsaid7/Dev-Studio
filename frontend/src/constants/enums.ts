@@ -7,6 +7,8 @@
  */
 
 export {
+  CURRENCIES,
+  ACTIVITY_TYPES,
   TECH_AREA_IDS,
   TECH_AREA_LABELS,
   SOFT_AREA_ID,
@@ -56,6 +58,8 @@ export {
 } from "@shared/enums";
 
 export type {
+  Currency,
+  ActivityType,
   TechAreaId,
   SoftAreaId,
   QuestionDifficulty,
