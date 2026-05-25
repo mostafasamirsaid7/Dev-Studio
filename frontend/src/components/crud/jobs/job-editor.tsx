@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, ExternalLink, Loader2, Trash2 } from "lucide-react";
 import type { SavedJob, JobStatus } from "@/types/jobs";
 import { JOB_STATUSES, JOB_PLATFORMS, JOB_CATEGORIES } from "@/types/jobs";
+import { JOB_STATUS_LABELS } from "@/constants";
 import { JobBrowser } from "@/features/jobs/job-browser";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Props {
   job: SavedJob | null;
@@ -109,8 +114,7 @@ export function JobEditor({ job, isNew, onSave, onDelete, onSaveRemote, onSaveOf
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-xl space-y-4">
           <Field label="Job Title *">
-            <input
-              className={inp}
+            <Input
               value={form.title ?? ""}
               onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
               placeholder="Senior Frontend Developer"
@@ -119,16 +123,14 @@ export function JobEditor({ job, isNew, onSave, onDelete, onSaveRemote, onSaveOf
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Company">
-              <input
-                className={inp}
+              <Input
                 value={form.company ?? ""}
                 onChange={(e) => setForm((p) => ({ ...p, company: e.target.value }))}
                 placeholder="Acme Corp"
               />
             </Field>
             <Field label="Location">
-              <input
-                className={inp}
+              <Input
                 value={form.location ?? ""}
                 onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))}
                 placeholder="Cairo / Remote"
@@ -138,49 +140,55 @@ export function JobEditor({ job, isNew, onSave, onDelete, onSaveRemote, onSaveOf
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Platform">
-              <select
-                className={inp}
-                value={form.platform ?? ""}
-                onChange={(e) => setForm((p) => ({ ...p, platform: e.target.value }))}
+              <Select
+                value={form.platform ?? "LinkedIn"}
+                onValueChange={(v) => setForm((p) => ({ ...p, platform: v }))}
               >
-                {JOB_PLATFORMS.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {JOB_PLATFORMS.map((p) => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <Field label="Status">
-              <select
-                className={inp}
+              <Select
                 value={form.status ?? "saved"}
-                onChange={(e) => setForm((p) => ({ ...p, status: e.target.value as JobStatus }))}
+                onValueChange={(v) => setForm((p) => ({ ...p, status: v as JobStatus }))}
               >
-                {JOB_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {s.charAt(0).toUpperCase() + s.slice(1)}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {JOB_STATUSES.map((s) => (
+                    <SelectItem key={s} value={s}>{JOB_STATUS_LABELS[s] ?? s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Job Type">
-              <select
-                className={inp}
-                value={form.category ?? ""}
-                onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+              <Select
+                value={form.category || undefined}
+                onValueChange={(v) => setForm((p) => ({ ...p, category: v }))}
               >
-                <option value="">Any type</option>
-                {JOB_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Any type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {JOB_CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <Field label="Salary">
-              <input
-                className={inp}
+              <Input
                 value={form.salary ?? ""}
                 onChange={(e) => setForm((p) => ({ ...p, salary: e.target.value }))}
                 placeholder="$80k – $120k"
@@ -189,9 +197,8 @@ export function JobEditor({ job, isNew, onSave, onDelete, onSaveRemote, onSaveOf
           </div>
 
           <Field label="Job URL">
-            <input
+            <Input
               type="url"
-              className={inp}
               value={form.url ?? ""}
               onChange={(e) => setForm((p) => ({ ...p, url: e.target.value }))}
               placeholder="https://…"
@@ -199,12 +206,10 @@ export function JobEditor({ job, isNew, onSave, onDelete, onSaveRemote, onSaveOf
           </Field>
 
           <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
+            <Checkbox
               id="remote-chk"
               checked={form.remote ?? false}
-              onChange={(e) => setForm((p) => ({ ...p, remote: e.target.checked }))}
-              className="rounded border-border accent-primary size-3.5"
+              onCheckedChange={(checked) => setForm((p) => ({ ...p, remote: checked === true }))}
             />
             <label htmlFor="remote-chk" className="text-xs text-muted-foreground cursor-pointer">
               Remote position
@@ -229,8 +234,8 @@ export function JobEditor({ job, isNew, onSave, onDelete, onSaveRemote, onSaveOf
               ))}
             </div>
             <div className="flex gap-2">
-              <input
-                className={`${inp} flex-1`}
+              <Input
+                className="flex-1"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
@@ -246,8 +251,8 @@ export function JobEditor({ job, isNew, onSave, onDelete, onSaveRemote, onSaveOf
           </Field>
 
           <Field label="Notes">
-            <textarea
-              className={`${inp} min-h-[80px] resize-y`}
+            <Textarea
+              className="min-h-[80px] resize-y"
               value={form.notes ?? ""}
               onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
               placeholder="Interview notes, contacts, next steps…"
@@ -279,9 +284,6 @@ export function JobEditor({ job, isNew, onSave, onDelete, onSaveRemote, onSaveOf
     </div>
   );
 }
-
-const inp =
-  "w-full px-3 py-2 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-ring";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

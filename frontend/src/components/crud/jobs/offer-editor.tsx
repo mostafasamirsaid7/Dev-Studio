@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { Loader2, Trash2, ExternalLink, Handshake } from "lucide-react";
 import type { FreelanceOffer, OfferStatus } from "@/types/jobs";
 import { OFFER_STATUSES, OFFER_PLATFORMS, OFFER_CATEGORIES } from "@/types/jobs";
+import { OFFER_STATUS_LABELS } from "@/constants";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 interface Props {
   offer: FreelanceOffer | null;
@@ -25,6 +29,8 @@ const EMPTY: Partial<FreelanceOffer> = {
   tags: [],
   notes: "",
 };
+
+const CURRENCIES = ["USD", "EUR", "SAR", "EGP", "AED", "GBP"];
 
 export function OfferEditor({ offer, isNew, onSave, onDelete }: Props) {
   const [form, setForm] = useState<Partial<FreelanceOffer>>(EMPTY);
@@ -111,8 +117,7 @@ export function OfferEditor({ offer, isNew, onSave, onDelete }: Props) {
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-xl space-y-4">
           <Field label="Offer Title *">
-            <input
-              className={inp}
+            <Input
               value={form.title ?? ""}
               onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
               placeholder="Build a React dashboard"
@@ -120,60 +125,65 @@ export function OfferEditor({ offer, isNew, onSave, onDelete }: Props) {
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Client Name">
-              <input
-                className={inp}
+              <Input
                 value={form.client ?? ""}
                 onChange={(e) => setForm((p) => ({ ...p, client: e.target.value }))}
                 placeholder="John D."
               />
             </Field>
             <Field label="Platform">
-              <select
-                className={inp}
-                value={form.platform ?? ""}
-                onChange={(e) => setForm((p) => ({ ...p, platform: e.target.value }))}
+              <Select
+                value={form.platform ?? "Mostaql"}
+                onValueChange={(v) => setForm((p) => ({ ...p, platform: v }))}
               >
-                {OFFER_PLATFORMS.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {OFFER_PLATFORMS.map((p) => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Category">
-              <select
-                className={inp}
-                value={form.category ?? ""}
-                onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+              <Select
+                value={form.category || undefined}
+                onValueChange={(v) => setForm((p) => ({ ...p, category: v }))}
               >
-                <option value="">Select category</option>
-                {OFFER_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {OFFER_CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <Field label="Status">
-              <select
-                className={inp}
+              <Select
                 value={form.status ?? "new"}
-                onChange={(e) => setForm((p) => ({ ...p, status: e.target.value as OfferStatus }))}
+                onValueChange={(v) => setForm((p) => ({ ...p, status: v as OfferStatus }))}
               >
-                {OFFER_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {s.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {OFFER_STATUSES.map((s) => (
+                    <SelectItem key={s} value={s}>{OFFER_STATUS_LABELS[s] ?? s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
               <Field label="Budget">
-                <input
-                  className={inp}
+                <Input
                   value={form.budget ?? ""}
                   onChange={(e) => setForm((p) => ({ ...p, budget: e.target.value }))}
                   placeholder="500"
@@ -181,39 +191,39 @@ export function OfferEditor({ offer, isNew, onSave, onDelete }: Props) {
               </Field>
             </div>
             <Field label="Currency">
-              <select
-                className={inp}
+              <Select
                 value={form.currency ?? "USD"}
-                onChange={(e) => setForm((p) => ({ ...p, currency: e.target.value }))}
+                onValueChange={(v) => setForm((p) => ({ ...p, currency: v }))}
               >
-                {["USD", "EUR", "SAR", "EGP", "AED", "GBP"].map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
           </div>
           <Field label="Deadline">
-            <input
+            <Input
               type="date"
-              className={inp}
               value={form.deadline ?? ""}
               onChange={(e) => setForm((p) => ({ ...p, deadline: e.target.value }))}
             />
           </Field>
           <Field label="Offer URL">
-            <input
+            <Input
               type="url"
-              className={inp}
               value={form.url ?? ""}
               onChange={(e) => setForm((p) => ({ ...p, url: e.target.value }))}
               placeholder="https://mostaql.com/projects/…"
             />
           </Field>
           <Field label="Description">
-            <textarea
-              className={`${inp} min-h-[80px] resize-y`}
+            <Textarea
+              className="min-h-[80px] resize-y"
               value={form.description ?? ""}
               onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
               placeholder="What the client needs…"
@@ -237,8 +247,8 @@ export function OfferEditor({ offer, isNew, onSave, onDelete }: Props) {
               ))}
             </div>
             <div className="flex gap-2">
-              <input
-                className={`${inp} flex-1`}
+              <Input
+                className="flex-1"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
@@ -253,8 +263,8 @@ export function OfferEditor({ offer, isNew, onSave, onDelete }: Props) {
             </div>
           </Field>
           <Field label="Notes">
-            <textarea
-              className={`${inp} min-h-[70px] resize-y`}
+            <Textarea
+              className="min-h-[70px] resize-y"
               value={form.notes ?? ""}
               onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
               placeholder="Your notes, questions, proposal ideas…"
@@ -285,9 +295,6 @@ export function OfferEditor({ offer, isNew, onSave, onDelete }: Props) {
     </div>
   );
 }
-
-const inp =
-  "w-full px-3 py-2 text-sm rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-ring";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

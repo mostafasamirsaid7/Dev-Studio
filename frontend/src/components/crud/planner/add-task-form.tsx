@@ -11,6 +11,7 @@ import {
   TASK_TIME_OPTIONS as TIME_OPTIONS,
 } from "@/data/planner/planner";
 import { formatMinutes } from "@/lib/utils/planner";
+import { Input } from "@/components/ui/input";
 
 interface AddTaskFormProps {
   date: string;
@@ -122,7 +123,7 @@ export function AddTaskForm({
       onSubmit={handleSubmit}
       className="rounded-2xl border border-primary/25 bg-gradient-to-b from-primary/5 to-transparent p-4 space-y-3 shadow-sm"
     >
-      <input
+      <Input
         ref={titleRef}
         type="text"
         value={title}
@@ -130,16 +131,16 @@ export function AddTaskForm({
         placeholder="What needs to be done?"
         maxLength={120}
         onKeyDown={(e) => e.key === "Escape" && reset()}
-        className="w-full bg-background/80 border border-input rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all"
+        className="bg-background/80 border-input rounded-xl px-3.5 py-2.5 h-auto text-sm focus:ring-2 focus:ring-primary/25 focus:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/25 placeholder:text-muted-foreground/40 shadow-none"
       />
 
-      <input
+      <Input
         type="text"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Add a note (optional)"
         maxLength={200}
-        className="w-full bg-background/60 border border-input/60 rounded-xl px-3.5 py-2 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 placeholder:text-muted-foreground/35 transition-all"
+        className="bg-background/60 border-input/60 rounded-xl px-3.5 py-2 h-auto text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-muted-foreground/35 shadow-none"
       />
 
       <div className="flex items-center gap-2 flex-wrap">

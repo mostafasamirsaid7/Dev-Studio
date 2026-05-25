@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface AddQuestionFormProps {
   onSave: (title: string, guide: string) => void;
@@ -13,19 +15,19 @@ export function AddQuestionForm({ onSave, onCancel }: AddQuestionFormProps) {
 
   return (
     <div className="p-3 border-b border-border/60 space-y-2 bg-muted/20">
-      <input
+      <Input
         autoFocus
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Question title…"
-        className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40 transition-all"
+        className="bg-background border-border/60 rounded-xl text-xs focus:ring-1 focus:ring-primary/30 focus:border-primary/40 shadow-none"
       />
-      <textarea
+      <Textarea
         rows={2}
         value={guide}
         onChange={(e) => setGuide(e.target.value)}
         placeholder="Answer guide / tips (optional)"
-        className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40 resize-none transition-all"
+        className="bg-background border-border/60 rounded-xl text-xs focus:ring-1 focus:ring-primary/30 focus:border-primary/40 resize-none shadow-none"
       />
       <div className="flex items-center gap-1.5">
         <button

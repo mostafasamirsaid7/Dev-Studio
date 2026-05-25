@@ -10,6 +10,9 @@ import {
   STATUS_CLASSES,
   CATEGORY_LABELS,
 } from "@/data/planner/planner";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 interface EditTaskDialogProps {
   task: PlannerTask | null;
@@ -66,27 +69,25 @@ export function EditTaskDialog({ task, onSave, onClose }: EditTaskDialogProps) {
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
             <label className="text-xs font-medium text-muted-foreground">Title</label>
-            <input
+            <Input
               autoFocus
-              type="text"
+              className="mt-1"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 w-full bg-background border border-input rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40"
             />
           </div>
 
           <div>
             <label className="text-xs font-medium text-muted-foreground">Description</label>
-            <textarea
+            <Textarea
+              className="mt-1 resize-none"
+              rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="mt-1 w-full bg-background border border-input rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40 resize-none"
               placeholder="Optional notes…"
             />
           </div>
 
-          {/* Status */}
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Status</label>
             <div className="flex gap-1.5 flex-wrap">
@@ -108,11 +109,8 @@ export function EditTaskDialog({ task, onSave, onClose }: EditTaskDialogProps) {
             </div>
           </div>
 
-          {/* Priority */}
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-              Priority
-            </label>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Priority</label>
             <div className="flex gap-1.5">
               {PRIORITIES.map((p) => (
                 <button
@@ -132,20 +130,21 @@ export function EditTaskDialog({ task, onSave, onClose }: EditTaskDialogProps) {
             </div>
           </div>
 
-          {/* Category */}
           <div>
             <label className="text-xs font-medium text-muted-foreground">Category</label>
-            <select
+            <Select
               value={category}
-              onChange={(e) => setCategory(e.target.value as TaskCategory)}
-              className="mt-1 w-full bg-background border border-input rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/30"
+              onValueChange={(v) => setCategory(v as TaskCategory)}
             >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {CATEGORY_LABELS[c]}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((c) => (
+                  <SelectItem key={c} value={c}>{CATEGORY_LABELS[c]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex gap-2 pt-1">

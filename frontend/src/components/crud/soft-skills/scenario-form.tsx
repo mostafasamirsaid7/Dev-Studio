@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type Scenario } from "@/types/skills";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ScenarioFormProps {
   initial?: Partial<Scenario>;
@@ -67,12 +69,12 @@ export function ScenarioForm({ initial, onSave, onCancel }: ScenarioFormProps) {
         <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1 block">
           Scenario Title
         </label>
-        <input
+        <Input
           autoFocus
           value={form.title}
           onChange={set("title")}
           placeholder="e.g., Led migration to microservices at Acme Co."
-          className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40 transition-all"
+          className="bg-background border-border/60 rounded-xl text-sm focus:ring-1 focus:ring-primary/30 focus:border-primary/40 shadow-none"
         />
       </div>
       {FIELDS.map((f) => (
@@ -81,12 +83,12 @@ export function ScenarioForm({ initial, onSave, onCancel }: ScenarioFormProps) {
             <span className={cn("font-bold", f.color)}>{f.abbr}</span>
             <span className="text-muted-foreground">{f.label}</span>
           </label>
-          <textarea
+          <Textarea
             rows={2}
             value={form[f.key]}
             onChange={set(f.key)}
             placeholder={f.placeholder}
-            className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40 resize-none transition-all"
+            className="bg-background border-border/60 rounded-xl text-sm focus:ring-1 focus:ring-primary/30 focus:border-primary/40 resize-none shadow-none"
           />
         </div>
       ))}
