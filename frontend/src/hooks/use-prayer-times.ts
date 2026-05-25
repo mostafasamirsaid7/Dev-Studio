@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Moon, Sun, CloudSun, Sunset, MoonStar, type LucideIcon } from "lucide-react";
-import { toDateStr, to24hMin } from "@/lib/planner-utils";
+import { toDateStr, to24hMin } from "@/lib/utils/planner";
 import type { PrayerTime } from "@/types/planner";
 
 export type { PrayerTime };

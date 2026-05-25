@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePrayerTimes } from "@/hooks/use-prayer-times";
 import { PRAYER_TRACKER_KEY } from "@/data/planner/activities";
-import { to24hMin, formatCountdown, formatTime12, toDateStr } from "@/lib/planner-utils";
+import { to24hMin, formatCountdown, formatTime12, toDateStr } from "@/lib/utils/planner";
 
 /* ── Prayer tracker storage ──────────────────────── */
 function loadPrayerTracker(dateKey: string): Record<string, boolean> {

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import type { PrayerTime } from "@/types/planner";
 import type { ActivitySuggestion } from "@/data/planner/activities";
-import { to24hMin, formatMinutesLabel } from "@/lib/planner-utils";
+import { to24hMin, formatMinutesLabel } from "@/lib/utils/planner";
 
 export const ICON_MAP: Record<string, LucideIcon> = {
   Coffee,

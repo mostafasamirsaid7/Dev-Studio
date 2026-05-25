@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { toDateStr } from "@/lib/planner-utils";
+import { toDateStr } from "@/lib/utils/planner";
 import { ACTIVITIES_STORAGE_KEY } from "@/data/planner/activities";
 import type { ActivityItem, ActivitySuggestion } from "@/data/planner/activities";
 
