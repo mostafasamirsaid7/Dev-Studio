@@ -1,25 +1,25 @@
-## Description
+## 📝 Description
 
 Brief description of the changes in this PR.
 
-## Type of Change
+## 🔄 Type of Change
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to change)
-- [ ] Documentation update
+- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
+- [ ] ✨ New feature (non-breaking change which adds functionality)
+- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to change)
+- [ ] 📚 Documentation update
 
-## Related Issues
+## 🔗 Related Issues
 
 Closes #(issue number)
 
-## Changes Made
+## 🛠️ Changes Made
 
 - Change 1
 - Change 2
 - Change 3
 
-## Testing
+## 🧪 Testing
 
 Describe the tests you ran and how to reproduce them:
 
@@ -31,11 +31,11 @@ npm run test
 - [ ] Integration tests pass
 - [ ] Manual testing completed
 
-## Screenshots (if applicable)
+## 📸 Screenshots (if applicable)
 
 Add screenshots for UI changes.
 
-## Checklist
+## ✅ Checklist
 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
@@ -46,6 +46,6 @@ Add screenshots for UI changes.
 - [ ] New and existing unit tests passed locally with my changes
 - [ ] Any dependent changes have been merged and published
 
-## Additional Context
+## 📝 Additional Context
 
 Add any other context about the PR here.

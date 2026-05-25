@@ -66,19 +66,4 @@ To enable modern social sign-in:
 
 ## 💬 3. Slack Webhooks (Optional)
 
-To enable server-side automated message updates into your Slack channels:
-
-1. Visit the [Slack App Directory](https://api.slack.com/apps) and click **Create New App**.
-2. Select **From scratch**, name your app (e.g., `Dev Studio Hub`), and select your active Slack workspace.
-3. Under the features sidebar, select **Incoming Webhooks** and click **Activate Incoming Webhooks**.
-4. Scroll to the bottom and click **Add New Webhook to Workspace**.
-5. Choose the channel you want the notifications to post to, and click **Authorize**.
-6. Copy the generated webhook URL (starts with `https://hooks.slack.com/services/...`).
-7. Add the webhook URL to your **`backend/.env`** file:
-   ```ini
-   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
-   ```
-8. (Optional) To verify signature payloads of incoming requests, add your **Signing Secret** from the App's Basic Information tab:
-   ```ini
-   SLACK_SIGNING_SECRET=your_slack_signing_secret_here
-   ```
+To enable server-side automated message updates into your Slack channels, please refer to the detailed guide in our [Integrations Center](../integrations/README.md).

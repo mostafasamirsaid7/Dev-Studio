@@ -6,11 +6,11 @@ labels: bug
 assignees: ""
 ---
 
-## Description
+## 🐛 Description
 
 A clear and concise description of what the bug is.
 
-## Steps to Reproduce
+## 🔄 Steps to Reproduce
 
 Steps to reproduce the behavior:
 
@@ -19,29 +19,29 @@ Steps to reproduce the behavior:
 3. Scroll down to '....'
 4. See error
 
-## Expected Behavior
+## 🎯 Expected Behavior
 
 A clear and concise description of what you expected to happen.
 
-## Actual Behavior
+## 💥 Actual Behavior
 
 What actually happened instead.
 
-## Screenshots
+## 📸 Screenshots
 
 If applicable, add screenshots to help explain your problem.
 
-## Environment
+## 💻 Environment
 
 - **OS**: [e.g. Windows, macOS, Linux]
 - **Browser**: [e.g. Chrome, Firefox, Safari]
 - **Node Version**: [e.g. 18.0.0]
 - **npm Version**: [e.g. 9.0.0]
 
-## Additional Context
+## 📝 Additional Context
 
 Add any other context about the problem here.
 
-## Possible Solution
+## 💡 Possible Solution
 
 If you have a suggestion for how to fix this, please describe it here.

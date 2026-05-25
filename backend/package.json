@@ -11,7 +11,13 @@
     "db:seed": "npx tsx src/infrastructure/database/seed.ts",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:db": "vitest run src/tests/database/*.test.ts",
+    "test:repos": "vitest run src/tests/repositories/*.test.ts",
+    "test:services": "vitest run src/tests/services/*.test.ts",
+    "test:api": "vitest run src/tests/api/*.test.ts",
+    "test:integration": "vitest run src/tests/integration/*.test.ts",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
