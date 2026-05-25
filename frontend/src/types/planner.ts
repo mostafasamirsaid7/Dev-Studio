@@ -1,4 +1,5 @@
 import type { TaskPriority, TaskStatus, TaskCategory } from "@shared/enums";
+import type { LucideIcon } from "lucide-react";
 
 export type { TaskPriority, TaskStatus, TaskCategory };
 
@@ -14,4 +15,15 @@ export interface PlannerTask {
   estimatedMinutes?: number;
   createdAt: number;
   updatedAt: number;
+}
+
+export type StatusFilter = "all" | "todo" | "in-progress" | "done";
+
+export interface WeekTheme {
+  week: number;
+  title: string;
+  subtitle: string;
+  icon: LucideIcon;
+  color: string;
+  tags: string[];
 }
